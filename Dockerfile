@@ -1,4 +1,4 @@
-FROM node:20-alpine AS base
+FROM node:lts AS base
 
 # Install pnpm
 RUN npm install -g pnpm
@@ -15,4 +15,4 @@ FROM base AS deploy
 WORKDIR /app
 ENV NODE_ENV production
 COPY --from=builder /app ./
-CMD ["pnpm" ,"start"]
+CMD ["pnpm", "start"]
