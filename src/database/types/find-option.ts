@@ -1,15 +1,28 @@
 export type FindOptionDto = Partial<{
+  /**
+   * The page sort order.
+   */
   sort: 'asc' | 'desc';
-  page: number;
-  limit: number;
-  from: Date;
-  to: Date;
-}>;
 
-export const defaultFindOption = (): Required<FindOptionDto> => ({
-  sort: 'asc',
-  page: 1,
-  limit: 10,
-  from: new Date(0),
-  to: new Date(),
-});
+  /**
+   * The page number.
+   */
+  page: number;
+
+  /**
+   * The page size.
+   */
+  limit: number;
+
+  /**
+   * The minimum date to search by creation date.
+   * Can accept a number in timestamp format.
+   */
+  from: number;
+
+  /**
+   * The maximum date to search by creation date.
+   * Can accept a number in timestamp format.
+   */
+  to: number;
+}>;

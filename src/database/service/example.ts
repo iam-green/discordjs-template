@@ -1,25 +1,25 @@
 import { and, asc, between, desc, eq } from 'drizzle-orm';
 import { db } from '..';
-import {
-  CreateExampleDto,
-  defaultFindOption,
-  FindExampleDto,
-  UpdateExampleDto,
-} from '../types';
+import { CreateExampleDto, FindExampleDto, UpdateExampleDto } from '../types';
 import { example } from '../schema';
 
 export class ExampleService {
   static async find(data: FindExampleDto) {
-    const { id, created, sort, page, limit, from, to } = {
-      ...defaultFindOption(),
-      ...data,
-    };
+    const {
+      id,
+      created,
+      sort = 'asc',
+      page = 1,
+      limit = Number.MAX_SAFE_INTEGER,
+      from = 0,
+      to = Date.now(),
+    } = data;
     return await db.query.example.findMany({
       where: and(
         id ? eq(example.id, id) : undefined,
         created
           ? eq(example.created, created)
-          : between(example.created, from, to),
+          : between(example.created, new Date(from), new Date(to)),
       ),
       orderBy: sort == 'asc' ? [asc(example.created)] : [desc(example.created)],
       offset: (page - 1) * limit,
