@@ -1,5 +1,8 @@
-# Created by https://www.toptal.com/developers/gitignore/api/windows,macos,linux,node,git,visualstudiocode,intellij+all,yarn
-# Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,linux,node,git,visualstudiocode,intellij+all,yarn
+# Created by https://www.toptal.com/developers/gitignore/api/windows,macos,linux,node,intellij+all,visualstudiocode,dotenv,git,yarn
+# Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,linux,node,intellij+all,visualstudiocode,dotenv,git,yarn
+
+### dotenv ###
+.env
 
 ### Git ###
 # Created by git for backups. To disable backups in Git:
@@ -228,7 +231,6 @@ web_modules/
 .yarn-integrity
 
 # dotenv environment variable files
-.env
 .env.development.local
 .env.test.local
 .env.production.local
@@ -354,6 +356,4 @@ $RECYCLE.BIN/
 # and uncomment the following lines
 # .pnp.*
 
-.idea
-package-lock.json
-# End of https://www.toptal.com/developers/gitignore/api/windows,macos,linux,node,git,visualstudiocode,intellij+all,yarn
+# End of https://www.toptal.com/developers/gitignore/api/windows,macos,linux,node,intellij+all,visualstudiocode,dotenv,git,yarn
