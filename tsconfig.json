@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": { "@/*": ["src/*"] },
     "target": "es2020",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
