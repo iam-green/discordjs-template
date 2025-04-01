@@ -277,7 +277,7 @@ export class ExtendedApplicationCommand<
   Type extends AllowApplicationCommandType,
   InGuild extends boolean,
 > {
-  private static commands: ExtendedApplicationCommnadMap = new Map();
+  public static commands: ExtendedApplicationCommnadMap = new Map();
 
   constructor(
     public readonly data: ExtendedApplicationCommnadType<Type, InGuild>,
