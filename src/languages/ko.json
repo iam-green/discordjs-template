@@ -48,5 +48,7 @@
   "Permission_UseExternalSounds": "외부 사운드 사용",
   "Permission_SendVoiceMessages": "음성 메시지 보내기",
   "Permission_SendPolls": "투표 보내기",
-  "Permission_UseExternalApps": "외부 앱 사용"
+  "Permission_UseExternalApps": "외부 앱 사용",
+  "Subcommand_Description": "{0} 명령어는 하위 명령어로 만들어졌습니다",
+  "SubcommandGroup_Description": "{0} {1} 명령어는 하위 명령어 그룹으로 만들어졌습니다"
 }

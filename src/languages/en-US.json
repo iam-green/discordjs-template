@@ -48,5 +48,7 @@
   "Permission_UseExternalSounds": "Use External Sounds",
   "Permission_SendVoiceMessages": "Send Voice Messages",
   "Permission_SendPolls": "Send Polls",
-  "Permission_UseExternalApps": "Use External Apps"
+  "Permission_UseExternalApps": "Use External Apps",
+  "Subcommand_Description": "The {0} is made up of subcommand",
+  "SubcommandGroup_Description": "The {0} {1} is made up of subcommand group"
 }

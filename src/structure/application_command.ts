@@ -24,10 +24,13 @@ import {
   APIApplicationCommandSubcommandGroupOption,
   REST,
   Routes,
+  Locale,
 } from 'discord.js';
 import { ExtendedClient } from './client';
 import { glob } from 'glob';
 import chalk from 'chalk';
+import { Language } from './language';
+import { BotConfig } from '@/config';
 
 export type AllowApplicationCommandType =
   | ApplicationCommandType.ChatInput
@@ -150,6 +153,15 @@ export type ExtendedApplicationCommnadType<
    * @example ['Ping Command', 'Pong Command']
    */
   description: IsChatInput<Type, ValueOrArray<string>>;
+
+  /**
+   * Command Description for Command Parent
+   * * You can add descriptions to Subcommands and Subcommand Groups.
+   * * If no value is provided, the default setting will be applied.
+   */
+  parent_description?: Partial<
+    Record<'subcommand' | 'subcommand_group', ValueOrArray<LocalizationMap>>
+  >;
 
   /**
    * Command Localization
@@ -474,10 +486,10 @@ export class ExtendedApplicationCommand<
   ): NameArgIdx extends 0
     ? RESTPostAPIContextMenuApplicationCommandsJSONBody
     : APIApplicationCommandSubcommandGroupOption {
-    const name = toArray(command.name).find(
+    const name_idx = toArray(command.name).findIndex(
       (v) => v.split(' ')[name_arg_idx] == name_arg_text,
     );
-    if (!name)
+    if (name_idx < 0)
       throw new Error(
         [
           'Command Name is not valid.',
@@ -486,12 +498,38 @@ export class ExtendedApplicationCommand<
         ].join('\n'),
       );
 
+    const name = toArray(command.name)[name_idx];
     const name_arg = name.split(' ');
-    const description =
-      // TODO: 명령어 설명을 다국어로 지원할 수 있도록 수정
-      name_arg_idx == 0
-        ? 'subcommand description'
-        : 'subcommand group description';
+
+    const parent_description_arg = (locale: Locale) =>
+      toArray(
+        command.parent_description?.[
+          name_arg_idx == 0 ? 'subcommand' : 'subcommand_group'
+        ] ?? [],
+      )?.[name_idx]?.[locale];
+
+    const name_localization_arg = (locale: Locale) =>
+      toArray(command.localization?.name ?? [])?.[name_idx]?.[locale]?.split(
+        ' ',
+      );
+
+    const description_localizations: LocalizationMap =
+      Language.locales().reduce(
+        (cur, acc) => ({
+          ...cur,
+          [acc]:
+            parent_description_arg(acc) ??
+            Language.get(
+              acc,
+              name_arg_idx == 0
+                ? 'Subcommand_Description'
+                : 'SubcommandGroup_Description',
+              name_localization_arg(acc)?.[0] ?? name_arg[0],
+              name_localization_arg(acc)?.[1] ?? name_arg[1],
+            ),
+        }),
+        {},
+      );
 
     return {
       type:
@@ -505,7 +543,8 @@ export class ExtendedApplicationCommand<
         name_arg_idx,
       ),
       name: name_arg[name_arg_idx],
-      description,
+      description: description_localizations[BotConfig.DEFAULT_LANGUAGE],
+      description_localizations,
       options: [],
     } as unknown as NameArgIdx extends 0
       ? RESTPostAPIContextMenuApplicationCommandsJSONBody
@@ -517,7 +556,7 @@ export class ExtendedApplicationCommand<
   ): ApplicationCommandsJSONBody[] {
     const result: ApplicationCommandsJSONBody[] = [];
 
-    for (const [key, command] of commands) {
+    for (const command of commands.values()) {
       const names_sorted = toArray(command.name).sort(
         (a, b) => b.split(' ').length - a.split(' ').length,
       );
