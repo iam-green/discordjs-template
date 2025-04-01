@@ -21,7 +21,7 @@ export type ExtendedEventType<Key extends keyof ClientEvents> = {
    * @param client You can retrieve client data.
    * @param args You can retrieve arguments corresponding to the client event.
    */
-  run: (client: ExtendedClient, ...args: ClientEvents[Key]) => void;
+  run: (client: ExtendedClient, ...args: ClientEvents[Key]) => Promise<void>;
 };
 
 export type ExtendedEventMapKey = {

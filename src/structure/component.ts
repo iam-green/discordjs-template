@@ -223,7 +223,7 @@ export type ExtendedComponentType<
    * * Write the code to execute the component.
    * @param options You can retrieve client data, interaction data.
    */
-  run: (options: ComponentRunOptions<Type, InGuild>) => void;
+  run: (options: ComponentRunOptions<Type, InGuild>) => Promise<void>;
 };
 
 export type ExtendedComponentMapKey = {
