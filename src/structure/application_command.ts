@@ -594,13 +594,12 @@ export class ExtendedApplicationCommand<
                 : 'Context Menu'
             } for ${
               guild_id.length ? chalk.cyan('Guild') : chalk.red('Global')
-            }`,
-            `Location : ${chalk.yellow(key.path)}`,
-            `Key Name : ${chalk.green(key.function_name)}, Guild ID : ${
+            } (Key : ${chalk.green(key.function_name)}, Guild : ${
               !guild_id.length
                 ? chalk.red('None')
                 : guild_id.map((v) => chalk.cyan(v)).join(', ')
-            }`,
+            })`,
+            `Location : ${chalk.yellow(key.path)}`,
           ].join('\n'),
         );
       }

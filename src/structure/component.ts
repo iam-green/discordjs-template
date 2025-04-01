@@ -312,7 +312,9 @@ ExtendedComponent.logComponents = () => {
     if (key.path && key.function_name)
       Log.debug(
         [
-          `Added ${chalk.green(componentTypeEnumName(type))} Component for ${chalk.red('Global')}`,
+          `Added ${chalk.green(componentTypeEnumName(type))} Component for ${chalk.red(
+            'Global',
+          )} (Key : ${chalk.green(key.function_name)}`,
           `Location : ${chalk.yellow(key.path)}`,
           `Key Name : ${chalk.green(key.function_name)}`,
         ].join('\n'),
