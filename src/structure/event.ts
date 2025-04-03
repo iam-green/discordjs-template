@@ -1,10 +1,13 @@
-import { ClientEvents } from 'discord.js';
+import { ClientEvents, PermissionResolvable } from 'discord.js';
 import { ExtendedClient } from './client';
 import { glob } from 'glob';
-import { Log, sep } from '@/common';
+import { Log, sep, ValueOrArray } from '@/common';
 import chalk from 'chalk';
 
-export type ExtendedEventType<Key extends keyof ClientEvents> = {
+export type ExtendedEventType<
+  Key extends keyof ClientEvents,
+  InGuild extends boolean,
+> = {
   /**
    * Discord Event Type
    */
@@ -14,6 +17,66 @@ export type ExtendedEventType<Key extends keyof ClientEvents> = {
    * Whether the component is single-use
    */
   once?: boolean;
+
+  /**
+   * Event Options
+   * * You can set desired options for the event.
+   */
+  options?: Partial<{
+    /**
+     * Whether the event is only available in guilds
+     * * If you enable this option, you can import guild-related information.
+     * @default false
+     */
+    only_guild: InGuild;
+
+    /**
+     * Set specific guilds to use the event
+     * * Configures the event to be usable only in the specified guilds.
+     */
+    guild_id: ValueOrArray<string>;
+
+    /**
+     * Event Permissions
+     * * Sets the permissions required to use the event.
+     */
+    permission: Partial<{
+      /**
+       * User Permissions
+       * * Permissions required for users to use the event.
+       * * If default_permission is enabled, the first value will be registered
+       *   as the default permission for the slash event.
+       */
+      user: ValueOrArray<PermissionResolvable>;
+
+      /**
+       * Bot Permissions
+       * Permissions required for the bot to execute the event.
+       */
+      bot: ValueOrArray<PermissionResolvable>;
+    }>;
+
+    /**
+     * Event for Bot Administrators Only
+     * * Sets the event to be available only to bot administrators.
+     * @default false
+     */
+    bot_admin: boolean;
+
+    /**
+     * Event for Bot Developers Only
+     * * Sets the event to be available only to bot developers.
+     * @default false
+     */
+    bot_developer: boolean;
+
+    /**
+     * Event for Guild Owners Only
+     * * Sets the event to be available only to guild owners.
+     * @default false
+     */
+    guild_owner: boolean;
+  }>;
 
   /**
    * Code to execute the event.
@@ -31,13 +94,16 @@ export type ExtendedEventMapKey = {
 
 export type ExtendedEventMap = Map<
   ExtendedEventMapKey,
-  ExtendedEventType<keyof ClientEvents>
+  ExtendedEventType<keyof ClientEvents, boolean>
 >;
 
-export class ExtendedEvent<Key extends keyof ClientEvents> {
+export class ExtendedEvent<
+  Key extends keyof ClientEvents,
+  InGuild extends boolean,
+> {
   public static events: ExtendedEventMap = new Map();
 
-  constructor(public readonly data: ExtendedEventType<Key>) {}
+  constructor(public readonly data: ExtendedEventType<Key, InGuild>) {}
 
   /**
    * Initialize the event
