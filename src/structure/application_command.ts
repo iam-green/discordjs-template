@@ -275,8 +275,9 @@ export type ExtendedApplicationCommnadType<
 
 export type ExtendedApplicationCommnadMapKey = {
   path: string;
+  type: AllowApplicationCommandType;
   function_name: string;
-  command_name: string[];
+  name: string[];
   guild_id?: string[];
 };
 
@@ -313,8 +314,9 @@ export class ExtendedApplicationCommand<
           this.commands.set(
             {
               path: path,
+              type: command.type,
               function_name: key,
-              command_name: toArray(command.name),
+              name: toArray(command.name),
               guild_id: command.options?.guild_id
                 ? toArray(command.options.guild_id)
                 : undefined,
