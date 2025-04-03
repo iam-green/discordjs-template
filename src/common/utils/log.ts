@@ -27,42 +27,47 @@ export class Log {
       : `${year}-${month}-${day} ${hour}:${minute}:${second}`;
   }
 
-  static prefix(type: string, color: (str: string) => string) {
-    return `${chalk.cyan('[')}${color(type)}${chalk.cyan(']')} ${chalk.cyan('(')}${chalk.yellow(this.date())}${chalk.cyan(')')}`;
+  static prefix(type: string, color: string) {
+    return chalk`{cyan [}{${color} ${type}}{cyan ]} {cyan (}{yellow ${this.date()}}{cyan )}`;
   }
 
-  static info(content: string) {
-    const result = `${this.prefix('INFO', chalk.green)} ${content.replace(/\n/g, '\n\t')}`;
+  static info(content: string, prefix?: string) {
+    const result = `${this.prefix('INFO', 'green')} ${
+      prefix ? prefix + ' ' : ''
+    }${content.replace(/\n/g, '\n\t')}`;
     console.log(result);
     if (process.env.SAVE_LOGS == 'true') this.write('info', result);
   }
 
-  static debug(content: string) {
-    const result = `${this.prefix('DEBUG', chalk.magenta)} ${content.replace(/\n/g, '\n\t')}`;
+  static debug(content: string, prefix?: string) {
+    const result = `${this.prefix('DEBUG', 'magenta')} ${
+      prefix ? prefix + ' ' : ''
+    }${content.replace(/\n/g, '\n\t')}`;
     if (process.env.NODE_ENV == 'development') console.log(result);
     if (process.env.SAVE_LOGS == 'true') this.write('debug', result);
   }
 
-  static warn(content: string) {
-    const result = `${this.prefix('WARN', chalk.yellow)} ${content.replace(/\n/g, '\n\t')}`;
+  static warn(content: string, prefix?: string) {
+    const result = `${this.prefix('WARN', 'yellow')} ${
+      prefix ? prefix + ' ' : ''
+    }${content.replace(/\n/g, '\n\t')}`;
     console.log(result);
     if (process.env.SAVE_LOGS == 'true') this.write('warn', result);
   }
 
-  static error(error, file?: string) {
-    const result = `${this.prefix('ERROR', chalk.red)} ${chalk
-      .red(
-        error instanceof Error
-          ? [
-              `${error.name} - ${error.message}`,
-              file ? `File : ${file}` : '',
-              `Stack : ${error.stack}`,
-            ]
-              .filter((v) => v)
-              .join('\n')
-          : error,
-      )
-      .replace(/\n/g, '\n\t')}`;
+  static error(error: any, file?: string, prefix?: string) {
+    const result = chalk`${this.prefix('ERROR', 'red')} ${
+      prefix ? prefix + ' ' : ''
+    }{red ${(error instanceof Error
+      ? [
+          `${error.name} - ${error.message}`,
+          file ? `File : ${file}` : '',
+          `Stack : ${error.stack}`,
+        ]
+          .filter((v) => v)
+          .join('\n')
+      : error
+    ).replace(/\n/g, '\n\t')}}`;
     console.log(result);
     if (process.env.SAVE_LOGS == 'true') this.write('error', result);
   }
