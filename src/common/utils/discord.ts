@@ -1,4 +1,12 @@
-import { REST, RouteBases, Routes } from 'discord.js';
+import {
+  PermissionFlags,
+  PermissionResolvable,
+  PermissionsBitField,
+  REST,
+  RouteBases,
+  Routes,
+} from 'discord.js';
+import { ValueOrArray } from 'drizzle-orm';
 
 export class DiscordUtil {
   static client_id = '';
@@ -30,5 +38,24 @@ export class DiscordUtil {
       result.team && process.env.DISCORD_USER_TOKEN
         ? team.map((v) => v.id).filter((v) => v != result.id)
         : [];
+  }
+
+  static convertPermissionToString(
+    value: PermissionResolvable,
+  ): keyof typeof PermissionsBitField.Flags {
+    return (
+      typeof value != 'bigint' && !/^-?\d+$/.test(value.toString())
+        ? value
+        : Object.entries(PermissionsBitField.Flags).find(
+            ([, v]) => v == value,
+          )![0]
+    ) as keyof PermissionFlags;
+  }
+
+  static checkPermission(
+    member_permission?: Readonly<PermissionsBitField> | null,
+    ...need_permission: PermissionResolvable[]
+  ) {
+    return need_permission.filter((v) => !member_permission?.has(v));
   }
 }
