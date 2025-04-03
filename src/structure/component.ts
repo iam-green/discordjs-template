@@ -230,6 +230,7 @@ export type ExtendedComponentMapKey = {
   path?: string;
   function_name?: string;
   id: string;
+  type: SupportComponentType;
   expire?: number;
 };
 
@@ -263,7 +264,7 @@ export const ExtendedComponent = <
       ? data.component(new ComponentBuilderMap[data.type]({ custom_id: id }))
       : data.component
   ) as ComponentBuilderType[Type];
-  ExtendedComponent.components.set({ id, expire }, data);
+  ExtendedComponent.components.set({ id, type: data.type, expire }, data);
   return Object.assign(component, { data });
 };
 
@@ -298,6 +299,7 @@ ExtendedComponent.init = async (
             path,
             function_name: key,
             id: data.id,
+            type: data.type,
             expire: data.options?.expire
               ? Date.now() + data.options?.expire
               : undefined,
