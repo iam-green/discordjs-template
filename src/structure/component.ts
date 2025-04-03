@@ -232,6 +232,7 @@ export type ExtendedComponentMapKey = {
   id: string;
   type: SupportComponentType;
   expire?: number;
+  expire_time?: number;
 };
 
 export type ExtendedComponentMap = Map<
@@ -256,15 +257,22 @@ export const ExtendedComponent = <
   data: ExtendedComponentType<Type, InGuild>,
 ) => {
   const id = data.id + ((data.random_id ?? true) ? '_' + generateUUID() : '');
-  const expire = data.options?.expire
-    ? Date.now() + data.options?.expire
-    : undefined;
   const component = (
     data.component instanceof Function
       ? data.component(new ComponentBuilderMap[data.type]({ custom_id: id }))
       : data.component
   ) as ComponentBuilderType[Type];
-  ExtendedComponent.components.set({ id, type: data.type, expire }, data);
+  ExtendedComponent.components.set(
+    {
+      id,
+      type: data.type,
+      expire: data.options?.expire,
+      expire_time: data.options?.expire
+        ? Date.now() + data.options?.expire
+        : undefined,
+    },
+    data,
+  );
   return Object.assign(component, { data });
 };
 
@@ -300,7 +308,8 @@ ExtendedComponent.init = async (
             function_name: key,
             id: data.id,
             type: data.type,
-            expire: data.options?.expire
+            expire: data.options?.expire,
+            expire_time: data.options?.expire
               ? Date.now() + data.options?.expire
               : undefined,
           },
@@ -311,15 +320,19 @@ ExtendedComponent.init = async (
 };
 
 ExtendedComponent.logComponents = () => {
-  for (const [key, { type }] of ExtendedComponent.components)
-    if (key.path && key.function_name)
+  for (const {
+    path,
+    function_name,
+    type,
+  } of ExtendedComponent.components.keys())
+    if (path && function_name)
       Log.debug(
         [
           `Added ${chalk.green(componentTypeEnumName(type))} Component for ${chalk.red(
             'Global',
-          )} (Key : ${chalk.green(key.function_name)}`,
-          `Location : ${chalk.yellow(key.path)}`,
-          `Key Name : ${chalk.green(key.function_name)}`,
+          )} (Key : ${chalk.green(function_name)}`,
+          `Location : ${chalk.yellow(path)}`,
+          `Key Name : ${chalk.green(function_name)}`,
         ].join('\n'),
       );
 };
