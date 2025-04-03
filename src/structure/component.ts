@@ -240,7 +240,7 @@ export type ExtendedComponentMap = Map<
 
 const generateUUID = () => {
   let uuid = randomUUID();
-  while ([...ExtendedComponent.list].find(([k]) => k.id.endsWith(uuid)))
+  while ([...ExtendedComponent.components].find(([k]) => k.id.endsWith(uuid)))
     uuid = randomUUID();
   return uuid;
 };
@@ -263,15 +263,16 @@ export const ExtendedComponent = <
       ? data.component(new ComponentBuilderMap[data.type]({ custom_id: id }))
       : data.component
   ) as ComponentBuilderType[Type];
-  ExtendedComponent.list.set({ id, expire }, data);
+  ExtendedComponent.components.set({ id, expire }, data);
   return Object.assign(component, { data });
 };
 
-ExtendedComponent.list = new Map() as ExtendedComponentMap;
+ExtendedComponent.components = new Map() as ExtendedComponentMap;
 
 ExtendedComponent.removeExpired = () => {
-  for (const k of ExtendedComponent.list.keys())
-    if (k.expire && k.expire < Date.now()) ExtendedComponent.list.delete(k);
+  for (const k of ExtendedComponent.components.keys())
+    if (k.expire && k.expire < Date.now())
+      ExtendedComponent.components.delete(k);
 };
 
 /**
@@ -292,7 +293,7 @@ ExtendedComponent.init = async (
           SupportComponentType,
           boolean
         >;
-        ExtendedComponent.list.set(
+        ExtendedComponent.components.set(
           {
             path,
             function_name: key,
@@ -308,7 +309,7 @@ ExtendedComponent.init = async (
 };
 
 ExtendedComponent.logComponents = () => {
-  for (const [key, { type }] of ExtendedComponent.list)
+  for (const [key, { type }] of ExtendedComponent.components)
     if (key.path && key.function_name)
       Log.debug(
         [
