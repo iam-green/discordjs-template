@@ -50,5 +50,17 @@
   "Permission_SendPolls": "투표 보내기",
   "Permission_UseExternalApps": "외부 앱 사용",
   "Subcommand_Description": "{0} 명령어는 하위 명령어로 만들어졌습니다",
-  "SubcommandGroup_Description": "{0} {1} 명령어는 하위 명령어 그룹으로 만들어졌습니다"
+  "SubcommandGroup_Description": "{0} {1} 명령어는 하위 명령어 그룹으로 만들어졌습니다",
+  "Embed_Warn_OnlyCanUseInGuild_Title": ":warning: 서버에서만 사용 가능",
+  "Embed_Warn_OnlyCanUseInGuild_Description": "이 상호작용은 서버에서만 사용할 수 있습니다.",
+  "Embed_Warn_InteractionCooldown_Title": ":warning: 상호작용 쿨다운",
+  "Embed_Warn_InteractionCooldown_Description": "이 상호작용 <t:{0}:R>에 다시 사용할 수 있습니다.",
+  "Embed_Warn_NoPermission_bot_Title": ":warning: 봇 권한 없음",
+  "Embed_Warn_NoPermission_bot_Description": "봇에게 {0} 권한이 없어 이 상호작용을 사용할 수 없습니다.",
+  "Embed_Warn_NoPermission_user_Title": ":warning: 유저 권한 없음",
+  "Embed_Warn_NoPermission_user_Description": "이 상호작용을 사용하려면 {0} 권한이 필요합니다.",
+  "Embed_Warn_OnlyBotAdminCanUse_Title": ":warning: 봇 관리자만 사용 가능",
+  "Embed_Warn_OnlyBotAdminCanUse_Description": "이 상호작용은 봇 관리자만 사용할 수 있습니다.",
+  "Embed_Warn_OnlyGuildOwnerCanUse_Title": ":warning: 서버 소유자만 사용 가능",
+  "Embed_Warn_OnlyGuildOwnerCanUse_Description": "이 상호작용은 서버 소유자만 사용할 수 있습니다."
 }

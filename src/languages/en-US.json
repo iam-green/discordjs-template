@@ -50,5 +50,17 @@
   "Permission_SendPolls": "Send Polls",
   "Permission_UseExternalApps": "Use External Apps",
   "Subcommand_Description": "The {0} is made up of subcommand",
-  "SubcommandGroup_Description": "The {0} {1} is made up of subcommand group"
+  "SubcommandGroup_Description": "The {0} {1} is made up of subcommand group",
+  "Embed_Warn_OnlyCanUseInGuild_Title": ":warning: Only Guild Owner Can Use",
+  "Embed_Warn_OnlyCanUseInGuild_Description": "This interaction can only be used by the server owner.",
+  "Embed_Warn_InteractionCooldown_Title": ":warning: Interaction Cooldown",
+  "Embed_Warn_InteractionCooldown_Description": "You can use this interaction again after <t:{0}:R>.",
+  "Embed_Warn_NoPermission_bot_Title": ":warning: No Bot Permission",
+  "Embed_Warn_NoPermission_bot_Description": "The bot don't have {0} permission, this interaction cannot be used.",
+  "Embed_Warn_NoPermission_user_Title": ":warning: No User Permission",
+  "Embed_Warn_NoPermission_user_Description": "You need the {0} permission to use this interaction.",
+  "Embed_Warn_OnlyBotAdminCanUse_Title": ":warning: Only Bot Admin Can Use",
+  "Embed_Warn_OnlyBotAdminCanUse_Description": "This interaction can only be used by the bot administrator.",
+  "Embed_Warn_OnlyGuildOwnerCanUse_Title": ":warning: Only Guild Owner Can Use",
+  "Embed_Warn_OnlyGuildOwnerCanUse_Description": "This interaction can only be used by the server owner."
 }
