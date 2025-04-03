@@ -20,4 +20,13 @@ export const BotConfig = {
       },
     },
   } as ClientOptions,
+  APPLICATION_COMMAND_FOLDERS: ['command', 'context', 'commands', 'contexts'],
+  COMPONENT_FOLDERS: ['component', 'components'],
+  TEXT_COMMAND_FOLDERS: [
+    'text_command',
+    'text_commands',
+    'textcommand',
+    'textcommands',
+  ],
+  EVENT_FOLDERS: ['event', 'events'],
 };
