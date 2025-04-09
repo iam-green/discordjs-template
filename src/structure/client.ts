@@ -41,15 +41,15 @@ export class ExtendedClient extends Client {
     super(option);
   }
 
-  error(error: any) {
+  error = (error: any) => {
     if (!error.toString().includes('DiscordAPIError[10062]'))
       this.log.error(error);
-  }
+  };
 
-  errorWithOut<T>(error: any, out: T) {
+  errorWithOut = <T>(error: any, out: T) => {
     this.error(error);
     return out;
-  }
+  };
 
   async start() {
     await DiscordUtil.refresh();
