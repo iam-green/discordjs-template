@@ -6,7 +6,6 @@ import {
   RouteBases,
   Routes,
 } from 'discord.js';
-import { ValueOrArray } from 'drizzle-orm';
 
 export class DiscordUtil {
   static client_id = '';
@@ -19,9 +18,11 @@ export class DiscordUtil {
 
     const rest = new REST().setToken(process.env.BOT_TOKEN);
     const result: any = await rest.get(Routes.currentApplication());
-    const team = await (
-      await fetch(`${RouteBases.api}/teams/${result.team.id}/applications`)
-    ).json();
+    const team = result.team
+      ? await (
+          await fetch(`${RouteBases.api}/teams/${result.team.id}/applications`)
+        ).json()
+      : null;
 
     this.client_id = result.id;
     this.admin_id = result.team
