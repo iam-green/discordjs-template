@@ -35,7 +35,7 @@ export class ExtendedClient extends Client {
     error: (...content: any[]) => Log.error(this.prefix, ...content),
   };
 
-  private prefix = chalk`{cyan [}Cluster {green #${this.cluster.id}}{cyan ]}`;
+  private prefix = chalk`{cyan [}{reset Cluster} {green #${this.cluster.id}}{cyan ]}`;
 
   constructor(option: ClientOptions) {
     super(option);
