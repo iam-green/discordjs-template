@@ -12,6 +12,7 @@ import {
   InteractionReplyOptions,
   Locale,
   Message,
+  MessageFlags,
   PermissionFlagsBits,
   PermissionResolvable,
 } from 'discord.js';
@@ -338,7 +339,9 @@ export class ExtendedClient extends Client {
             .setTimestamp(),
         ],
         allowedMentions: { parse: [] },
-        ...('locale' in data && { ephemeral: true }),
+        ...('locale' in data && {
+          flags: MessageFlags.Ephemeral,
+        }),
       };
 
     if (options?.cooldown) {
@@ -370,7 +373,9 @@ export class ExtendedClient extends Client {
               .setTimestamp(),
           ],
           allowedMentions: { parse: [] },
-          ...('locale' in data && { ephemeral: true }),
+          ...('locale' in data && {
+            flags: MessageFlags.Ephemeral,
+          }),
         };
       this.cooldown[user.id][cooldown_id] = now + options.cooldown;
     }
@@ -414,7 +419,9 @@ export class ExtendedClient extends Client {
               .setTimestamp(),
           ],
           allowedMentions: { parse: [] },
-          ...('locale' in data && { ephemeral: true }),
+          ...('locale' in data && {
+            flags: MessageFlags.Ephemeral,
+          }),
         };
     }
 
@@ -442,7 +449,9 @@ export class ExtendedClient extends Client {
             .setTimestamp(),
         ],
         allowedMentions: { parse: [] },
-        ...('locale' in data && { ephemeral: true }),
+        ...('locale' in data && {
+          flags: MessageFlags.Ephemeral,
+        }),
       };
 
     if (options?.guild_owner && data.guild?.ownerId != user.id)
@@ -466,7 +475,9 @@ export class ExtendedClient extends Client {
             .setTimestamp(),
         ],
         allowedMentions: { parse: [] },
-        ...('locale' in data && { ephemeral: true }),
+        ...('locale' in data && {
+          flags: MessageFlags.Ephemeral,
+        }),
       };
 
     return null;
