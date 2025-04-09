@@ -4,12 +4,15 @@ import fs from 'fs';
 export class Log {
   private static write(type: string, ...content: any[]) {
     const date = this.date(true);
-    const path = `${__dirname}/../../log`;
+    const path = `${__dirname}/../../../logs`;
     for (const name of [`${type}_${date}.log`, `all_${date}.log`]) {
       if (!fs.existsSync(path)) fs.mkdirSync(path, { recursive: true });
       fs.appendFileSync(
-        `${path}/${name}`,
-        content.join(' ').replace(/\x1b\[[0-9;]*m/g, '') + '\n',
+        path + '/' + name,
+        content
+          .map(String)
+          .join(' ')
+          .replace(/\x1b\[[0-9;]*m/g, '') + '\n',
       );
     }
   }
@@ -39,7 +42,7 @@ export class Log {
       ),
     ];
     console.log(...result);
-    if (process.env.SAVE_LOGS == 'true') this.write('info', result);
+    if (process.env.SAVE_LOGS == 'true') this.write('info', ...result);
   }
 
   static debug(...content: any[]) {
@@ -50,7 +53,7 @@ export class Log {
       ),
     ];
     if (process.env.NODE_ENV == 'development') console.log(...result);
-    if (process.env.SAVE_LOGS == 'true') this.write('debug', result);
+    if (process.env.SAVE_LOGS == 'true') this.write('debug', ...result);
   }
 
   static warn(...content: any[]) {
@@ -61,7 +64,7 @@ export class Log {
       ),
     ];
     console.warn(...result);
-    if (process.env.SAVE_LOGS == 'true') this.write('warn', result);
+    if (process.env.SAVE_LOGS == 'true') this.write('warn', ...result);
   }
 
   static error(...content: any[]) {
@@ -81,6 +84,6 @@ export class Log {
       ),
     ];
     console.error(...result);
-    if (process.env.SAVE_LOGS == 'true') this.write('error', result);
+    if (process.env.SAVE_LOGS == 'true') this.write('error', ...result);
   }
 }
