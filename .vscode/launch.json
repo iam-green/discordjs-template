@@ -7,7 +7,8 @@
       "name": "Launch",
       "program": "${workspaceFolder}/src/index.ts",
       "outFiles": ["${workspaceFolder}/dist/**/*.js"],
-      "preLaunchTask": "build"
+      "preLaunchTask": "build",
+      "runtimeArgs": ["-r", "tsconfig-paths/register"]
     }
   ]
 }
