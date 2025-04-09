@@ -620,7 +620,7 @@ export class ExtendedApplicationCommand<
     return result;
   }
 
-  static logCommand() {
+  static async logCommand() {
     for (const [key, command] of this.commands) {
       const names_sorted = toArray(command.name).sort(
         (a, b) => b.split(' ').length - a.split(' ').length,
