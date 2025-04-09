@@ -46,11 +46,6 @@ export class ExtendedClient extends Client {
       this.log.error(error);
   };
 
-  errorWithOut = <T>(error: any, out: T) => {
-    this.error(error);
-    return out;
-  };
-
   async start() {
     await DiscordUtil.refresh();
     await Language.init();
