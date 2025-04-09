@@ -69,8 +69,10 @@ export class Log {
       this.prefix('ERROR', 'red'),
       ...content.map((v, i) =>
         v instanceof Error
-          ? [v.name + ' - ' + v.message, 'Stack : ' + v.stack].join('\n\t') +
-            (content.length - 1 > i ? '\n' : '')
+          ? [
+              v.name + ' - ' + v.message,
+              'Stack : ' + v.stack?.replace(/\n/g, '\n\t'),
+            ].join('\n\t') + (content.length - 1 > i ? '\n' : '')
           : typeof v == 'string'
             ? v.replace(/\n/g, '\n\t')
             : v,
