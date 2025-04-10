@@ -19,6 +19,7 @@
   "author": "iam-green",
   "license": "ISC",
   "dependencies": {
+    "@discordjs/voice": "^0.18.0",
     "chalk": "^4",
     "discord-hybrid-sharding": "^2.2.6",
     "discord.js": "^14.18.0",
