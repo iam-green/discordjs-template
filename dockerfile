@@ -1,5 +1,9 @@
 FROM node:lts AS base
 
+# Install Packages
+RUN apt-get update && \
+  apt-get install -y ffmpeg python3
+
 # Install pnpm
 RUN npm install -g pnpm
 
