@@ -12,6 +12,7 @@ export class DiscordUtil {
   static other_client_id = '';
   static admin_id: string[] = [];
   static developer_id: string[] = [];
+  static command_id: Record<string, string> = {};
 
   static async refresh() {
     if (!process.env.BOT_TOKEN) throw new Error('No Bot Token');
@@ -39,6 +40,13 @@ export class DiscordUtil {
       result.team && process.env.DISCORD_USER_TOKEN
         ? team.map((v) => v.id).filter((v) => v != result.id)
         : [];
+    this.command_id = (
+      (await rest.get(Routes.applicationCommands(this.client_id))) as any[]
+    ).reduce((a, b) => ({ ...a, [b.name]: b.id }), {});
+  }
+
+  static commandMention(name: string) {
+    return `</${name}:${this.command_id[name.split(' ')[0]] ?? 0}>`;
   }
 
   static convertPermissionToString(
