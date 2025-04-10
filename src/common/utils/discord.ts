@@ -1,4 +1,6 @@
+import { ExtendedClient } from '@/structure';
 import {
+  MessageCreateOptions,
   PermissionFlags,
   PermissionResolvable,
   PermissionsBitField,
@@ -6,6 +8,8 @@ import {
   RouteBases,
   Routes,
 } from 'discord.js';
+import { toArray } from './array';
+import { streamToBuffer } from './stream';
 
 export class DiscordUtil {
   static client_id = '';
@@ -47,6 +51,53 @@ export class DiscordUtil {
 
   static commandMention(name: string) {
     return `</${name}:${this.command_id[name.split(' ')[0]] ?? 0}>`;
+  }
+
+  static async send(
+    client: ExtendedClient,
+    channel_id: string,
+    message: string | MessageCreateOptions,
+  ) {
+    if (typeof message != 'string' && message.files) {
+      const files = toArray<any>(message.files);
+      message.files = await Promise.all(
+        files.map(async (file) => {
+          if (typeof file == 'string') return file;
+          const { attachment } = file;
+          if (Buffer.isBuffer(attachment)) {
+            return {
+              ...file,
+              attachment: attachment.toString('base64'),
+              encoding: 'base64',
+            };
+          } else if (attachment && typeof attachment.pipe === 'function') {
+            const buffer = await streamToBuffer(attachment);
+            return {
+              ...file,
+              attachment: buffer.toString('base64'),
+              encoding: 'base64',
+            };
+          }
+          return file;
+        }),
+      );
+    }
+
+    await client.cluster.broadcastEval(
+      async (client, { channel_id, message }) => {
+        const channel = await client.channels.fetch(channel_id);
+        if (!channel?.isSendable()) return;
+        if (typeof message != 'string' && message.files) {
+          message.files = message.files.map((file: any) =>
+            file.encoding == 'base64' && typeof file.attachment == 'string'
+              ? { ...file, attachment: Buffer.from(file.attachment, 'base64') }
+              : file,
+          );
+        }
+        return channel.send(message as any);
+      },
+      { context: { channel_id, message } },
+    );
   }
 
   static convertPermissionToString(
