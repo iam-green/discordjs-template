@@ -1,5 +1,6 @@
 import { ClusterConfig } from '@/config';
-import { ClusterManager } from 'discord-hybrid-sharding';
+import { ClusterClient, ClusterManager } from 'discord-hybrid-sharding';
+import { Status } from 'discord.js';
 
 export class Cluster {
   static manager: ClusterManager;
@@ -21,5 +22,33 @@ export class Cluster {
       },
     );
     await this.manager.spawn({ timeout: -1 });
+  }
+
+  static async status(
+    cluster: ClusterManager | ClusterClient = this.manager,
+  ): Promise<
+    {
+      id: number;
+      status: keyof typeof Status;
+      shard: number[];
+      guild_count: number;
+      user_count: number;
+      latency: number;
+      uptime: number;
+      memory: string;
+    }[]
+  > {
+    return (
+      await cluster.broadcastEval(`({
+        id: this.cluster.id,
+        status: this.ws.status,
+        shard: this.cluster.shardList,
+        guild_count: this.guilds.cache.size,
+        user_count: this.users.cache.size,
+        latency: this.ws.ping,
+        uptime: this.uptime,
+        memory: +(process.memoryUsage().rss / 1024 / 1024).toFixed(2),
+      })`)
+    ).map((v) => ({ ...v, status: Status[v.status] }));
   }
 }
