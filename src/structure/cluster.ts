@@ -11,6 +11,8 @@ export class Cluster {
       {
         token: process.env.BOT_TOKEN,
         ...ClusterConfig,
+        mode:
+          process.env.NODE_ENV != 'production' ? 'worker' : ClusterConfig.mode,
         execArgv: [
           '-r',
           'tsconfig-paths/register',
