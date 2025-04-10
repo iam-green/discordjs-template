@@ -5,3 +5,4 @@ export * from './component';
 export * from './text_command';
 export * from './event';
 export * from './cluster';
+export * from './voice';
