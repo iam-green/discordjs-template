@@ -19,7 +19,7 @@ export class DiscordUtil {
   static command_id: Record<string, string> = {};
 
   static async refresh() {
-    if (!process.env.BOT_TOKEN) throw new Error('No Bot Token');
+    if (!process.env.BOT_TOKEN) throw new Error('BOT_TOKEN is missing');
 
     const rest = new REST().setToken(process.env.BOT_TOKEN);
     const result: any = await rest.get(Routes.currentApplication());

@@ -659,7 +659,7 @@ export class ExtendedApplicationCommand<
   }
 
   static async registerCommand() {
-    if (!process.env.BOT_TOKEN) throw new Error('No Bot Token');
+    if (!process.env.BOT_TOKEN) throw new Error('BOT_TOKEN is missing');;
     const rest = new REST().setToken(process.env.BOT_TOKEN);
     const command_filtered = new Map(
       [...this.commands].filter(([k]) => !k.guild_id),
@@ -671,7 +671,7 @@ export class ExtendedApplicationCommand<
   }
 
   static async registerGuildCommand() {
-    if (!process.env.BOT_TOKEN) throw new Error('No Bot Token');
+    if (!process.env.BOT_TOKEN) throw new Error('BOT_TOKEN is missing');;
     const rest = new REST().setToken(process.env.BOT_TOKEN);
     const command_filtered = new Map(
       [...this.commands].filter(([k]) => k.guild_id),
