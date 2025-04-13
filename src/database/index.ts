@@ -4,14 +4,14 @@ import { Log } from '@/common';
 import { Client } from 'pg';
 import * as schema from './schema';
 
-const queryClient = new Client(process.env.DATABASE_URL || '');
+const client = new Client(process.env.DATABASE_URL || '');
 
 export const databaseInit = async () => {
-  if (process.env.DATABASE_URL) {
-    await queryClient.connect();
+  if (!process.env.DATABASE_URL) return;
+  await client.connect();
+  if (process.env.AUTO_MIGRATE == 'true')
     await migrate(db, { migrationsFolder: `./src/database/migration` });
-    Log.info('Database Connected');
-  }
+  Log.info('Database Connected');
 };
 
-export const db = drizzle(queryClient, { schema });
+export const db = drizzle(client, { schema });
