@@ -194,6 +194,12 @@ export type ExtendedApplicationCommnadType<
     only_guild: InGuild;
 
     /**
+     * Whether the command is only available in development
+     * @default false
+     */
+    only_development: boolean;
+
+    /**
      * Set specific guilds to use the command
      * * Configures the command to be usable only in the specified guilds.
      */
@@ -311,6 +317,11 @@ export class ExtendedApplicationCommand<
       for (const key of Object.keys(content))
         if (content[key] instanceof ExtendedApplicationCommand) {
           const command = content[key].data;
+          if (
+            process.env.NODE_ENV == 'production' &&
+            command.options?.only_development
+          )
+            continue;
           this.commands.set(
             {
               path: path,

@@ -32,6 +32,12 @@ export type ExtendedTextCommandType<InGuild extends boolean> = {
     only_guild: InGuild;
 
     /**
+     * Whether the text command is only available in development
+     * @default false
+     */
+    only_development: boolean;
+
+    /**
      * Set specific guilds to use the text command
      * * Configures the text command to be usable only in the specified guilds.
      */
@@ -146,6 +152,11 @@ export class ExtendedTextCommand<InGuild extends boolean> {
 
   static async logCommand() {
     for (const [key, command] of this.commands) {
+      if (
+        process.env.NODE_ENV == 'production' &&
+        command?.options?.only_development
+      )
+        continue;
       const names_sorted = toArray(command.name).sort(
         (a, b) => b.split(' ').length - a.split(' ').length,
       );

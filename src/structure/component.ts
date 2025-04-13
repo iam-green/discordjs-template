@@ -160,6 +160,12 @@ export type ExtendedComponentType<
     only_guild: InGuild;
 
     /**
+     * Whether the component is only available in development
+     * @default false
+     */
+    only_development: boolean;
+
+    /**
      * Set specific guilds to use the component
      * * Configures the component to be usable only in the specified guilds.
      */
@@ -296,26 +302,31 @@ ExtendedComponent.init = async (
   );
   for (const path of components) {
     const content = await import(path);
-    for (const key of Object.keys(content))
-      if (content[key]?.data?.random_id == false) {
-        const data = content[key].data as ExtendedComponentType<
-          SupportComponentType,
-          boolean
-        >;
-        ExtendedComponent.components.set(
-          {
-            path,
-            function_name: key,
-            id: data.id,
-            type: data.type,
-            expire: data.options?.expire,
-            expire_time: data.options?.expire
-              ? Date.now() + data.options?.expire
-              : undefined,
-          },
-          data,
-        );
-      }
+    for (const key of Object.keys(content)) {
+      if (
+        process.env.NODE_ENV == 'production' &&
+        content[key]?.data?.options?.only_development
+      )
+        continue;
+      if (content[key]?.data?.random_id) continue;
+      const data = content[key].data as ExtendedComponentType<
+        SupportComponentType,
+        boolean
+      >;
+      ExtendedComponent.components.set(
+        {
+          path,
+          function_name: key,
+          id: data.id,
+          type: data.type,
+          expire: data.options?.expire,
+          expire_time: data.options?.expire
+            ? Date.now() + data.options?.expire
+            : undefined,
+        },
+        data,
+      );
+    }
   }
 };
 

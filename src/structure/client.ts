@@ -118,7 +118,9 @@ export class ExtendedClient extends Client {
         command_name: null,
         options: command.options,
       });
-      if (validate) return interaction.reply(validate).catch(this.error);
+      if (!validate.status)
+        if (!validate.message) return;
+        else return interaction.reply(validate.message).catch(this.error);
 
       Promise.resolve()
         .then(() =>
@@ -149,7 +151,9 @@ export class ExtendedClient extends Client {
         command_name: null,
         options: component.options,
       });
-      if (validate) return interaction.reply(validate).catch(this.error);
+      if (!validate.status)
+        if (!validate.message) return;
+        else return interaction.reply(validate.message).catch(this.error);
 
       Promise.resolve()
         .then(() => component.run({ client: this, interaction }))
@@ -238,11 +242,13 @@ export class ExtendedClient extends Client {
         command_name: command_key.command_name[0],
         options: command.options,
       });
-      if (validate)
-        return message
-          .reply(validate)
-          .then((m) => setTimeout(() => m.delete(), 10000))
-          .catch(this.error);
+      if (!validate.status)
+        if (!validate.message) return;
+        else
+          return message
+            .reply(validate.message)
+            .then((m) => setTimeout(() => m.delete(), 10000))
+            .catch(this.error);
 
       Promise.resolve()
         .then(() =>
@@ -272,7 +278,7 @@ export class ExtendedClient extends Client {
             command_name: event.event,
             options: event.options,
           });
-          if (validate) return;
+          if (!validate.status) return;
         }
 
         Promise.resolve()
@@ -292,6 +298,7 @@ export class ExtendedClient extends Client {
     command_name: T extends Message ? string : null;
     options?: Partial<{
       only_guild: boolean;
+      only_development: boolean;
       guild_id: ValueOrArray<string>;
       cooldown: number;
       permission: Partial<{
@@ -302,11 +309,17 @@ export class ExtendedClient extends Client {
       bot_developer: boolean;
       guild_owner: boolean;
     }>;
-  }):
-    | (T extends Interaction ? InteractionReplyOptions : BaseMessageOptions)
-    | null {
+  }): {
+    status: boolean;
+    message?: T extends Interaction
+      ? InteractionReplyOptions
+      : BaseMessageOptions;
+  } {
+    if (process.env.NODE_ENV != 'production' && options?.only_development)
+      return { status: false };
+
     const data = interaction ?? message;
-    if (!data) return null;
+    if (!data) return { status: false };
 
     const locale =
       'locale' in data
@@ -318,46 +331,17 @@ export class ExtendedClient extends Client {
 
     if (options?.only_guild && !data.guild)
       return {
-        embeds: [
-          new EmbedBuilder()
-            .setTitle(
-              Language.get(locale, 'Embed_Warn_OnlyCanUseInGuild_Title'),
-            )
-            .setDescription(
-              Language.get(locale, 'Embed_Warn_OnlyCanUseInGuild_Description'),
-            )
-            .setColor(EmbedConfig.WARN_COLOR)
-            .setFooter({
-              text: user.tag,
-              iconURL: user.avatarURL() || undefined,
-            })
-            .setTimestamp(),
-        ],
-        allowedMentions: { parse: [] },
-        ...('locale' in data && {
-          flags: MessageFlags.Ephemeral,
-        }),
-      };
-
-    if (options?.cooldown) {
-      const now = Date.now();
-      if (!this.cooldown.has(user.id)) this.cooldown.set(user.id, new Map());
-      if (!this.cooldown.get(user.id)?.has(cooldown_id))
-        this.cooldown.get(user.id)?.set(cooldown_id, 0);
-
-      const cooldown = this.cooldown.get(user.id)?.get(cooldown_id) ?? 0;
-      if (cooldown > now)
-        return {
+        status: false,
+        message: {
           embeds: [
             new EmbedBuilder()
               .setTitle(
-                Language.get(locale, 'Embed_Warn_InteractionCooldown_Title'),
+                Language.get(locale, 'Embed_Warn_OnlyCanUseInGuild_Title'),
               )
               .setDescription(
                 Language.get(
                   locale,
-                  'Embed_Warn_InteractionCooldown_Description',
-                  (cooldown / 1000) | 0,
+                  'Embed_Warn_OnlyCanUseInGuild_Description',
                 ),
               )
               .setColor(EmbedConfig.WARN_COLOR)
@@ -371,6 +355,44 @@ export class ExtendedClient extends Client {
           ...('locale' in data && {
             flags: MessageFlags.Ephemeral,
           }),
+        },
+      };
+
+    if (options?.cooldown) {
+      const now = Date.now();
+      if (!this.cooldown.has(user.id)) this.cooldown.set(user.id, new Map());
+      if (!this.cooldown.get(user.id)?.has(cooldown_id))
+        this.cooldown.get(user.id)?.set(cooldown_id, 0);
+
+      const cooldown = this.cooldown.get(user.id)?.get(cooldown_id) ?? 0;
+      if (cooldown > now)
+        return {
+          status: false,
+          message: {
+            embeds: [
+              new EmbedBuilder()
+                .setTitle(
+                  Language.get(locale, 'Embed_Warn_InteractionCooldown_Title'),
+                )
+                .setDescription(
+                  Language.get(
+                    locale,
+                    'Embed_Warn_InteractionCooldown_Description',
+                    (cooldown / 1000) | 0,
+                  ),
+                )
+                .setColor(EmbedConfig.WARN_COLOR)
+                .setFooter({
+                  text: user.tag,
+                  iconURL: user.avatarURL() || undefined,
+                })
+                .setTimestamp(),
+            ],
+            allowedMentions: { parse: [] },
+            ...('locale' in data && {
+              flags: MessageFlags.Ephemeral,
+            }),
+          },
         };
       this.cooldown[user.id][cooldown_id] = now + options.cooldown;
     }
@@ -387,24 +409,62 @@ export class ExtendedClient extends Client {
       );
       if (need_permission.length)
         return {
+          status: false,
+          message: {
+            embeds: [
+              new EmbedBuilder()
+                .setTitle(
+                  Language.get(
+                    locale,
+                    `Embed_Warn_NoPermission_${target}_Title` as keyof LanguageData,
+                  ),
+                )
+                .setDescription(
+                  '`' +
+                    Language.get(
+                      locale,
+                      `Embed_Warn_NoPermission_${target}_Description` as keyof LanguageData,
+                      need_permission
+                        .map((v) => DiscordUtil.convertPermissionToString(v))
+                        .join('`, `'),
+                    ) +
+                    '`',
+                )
+                .setColor(EmbedConfig.WARN_COLOR)
+                .setFooter({
+                  text: user.tag,
+                  iconURL: user.avatarURL() || undefined,
+                })
+                .setTimestamp(),
+            ],
+            allowedMentions: { parse: [] },
+            ...('locale' in data && {
+              flags: MessageFlags.Ephemeral,
+            }),
+          },
+        };
+    }
+
+    if (
+      (options?.bot_admin || options?.bot_developer) &&
+      ![
+        ...(options?.bot_admin ? DiscordUtil.admin_id : []),
+        ...(options?.bot_developer ? DiscordUtil.developer_id : []),
+      ].includes(user.id)
+    )
+      return {
+        status: false,
+        message: {
           embeds: [
             new EmbedBuilder()
               .setTitle(
-                Language.get(
-                  locale,
-                  `Embed_Warn_NoPermission_${target}_Title` as keyof LanguageData,
-                ),
+                Language.get(locale, 'Embed_Warn_OnlyBotAdminCanUse_Title'),
               )
               .setDescription(
-                '`' +
-                  Language.get(
-                    locale,
-                    `Embed_Warn_NoPermission_${target}_Description` as keyof LanguageData,
-                    need_permission
-                      .map((v) => DiscordUtil.convertPermissionToString(v))
-                      .join('`, `'),
-                  ) +
-                  '`',
+                Language.get(
+                  locale,
+                  'Embed_Warn_OnlyBotAdminCanUse_Description',
+                ),
               )
               .setColor(EmbedConfig.WARN_COLOR)
               .setFooter({
@@ -417,64 +477,38 @@ export class ExtendedClient extends Client {
           ...('locale' in data && {
             flags: MessageFlags.Ephemeral,
           }),
-        };
-    }
-
-    if (
-      (options?.bot_admin || options?.bot_developer) &&
-      ![
-        ...(options?.bot_admin ? DiscordUtil.admin_id : []),
-        ...(options?.bot_developer ? DiscordUtil.developer_id : []),
-      ].includes(user.id)
-    )
-      return {
-        embeds: [
-          new EmbedBuilder()
-            .setTitle(
-              Language.get(locale, 'Embed_Warn_OnlyBotAdminCanUse_Title'),
-            )
-            .setDescription(
-              Language.get(locale, 'Embed_Warn_OnlyBotAdminCanUse_Description'),
-            )
-            .setColor(EmbedConfig.WARN_COLOR)
-            .setFooter({
-              text: user.tag,
-              iconURL: user.avatarURL() || undefined,
-            })
-            .setTimestamp(),
-        ],
-        allowedMentions: { parse: [] },
-        ...('locale' in data && {
-          flags: MessageFlags.Ephemeral,
-        }),
+        },
       };
 
     if (options?.guild_owner && data.guild?.ownerId != user.id)
       return {
-        embeds: [
-          new EmbedBuilder()
-            .setTitle(
-              Language.get(locale, 'Embed_Warn_OnlyGuildOwnerCanUse_Title'),
-            )
-            .setDescription(
-              Language.get(
-                locale,
-                'Embed_Warn_OnlyGuildOwnerCanUse_Description',
-              ),
-            )
-            .setColor(EmbedConfig.WARN_COLOR)
-            .setFooter({
-              text: user.tag,
-              iconURL: user.avatarURL() || undefined,
-            })
-            .setTimestamp(),
-        ],
-        allowedMentions: { parse: [] },
-        ...('locale' in data && {
-          flags: MessageFlags.Ephemeral,
-        }),
+        status: false,
+        message: {
+          embeds: [
+            new EmbedBuilder()
+              .setTitle(
+                Language.get(locale, 'Embed_Warn_OnlyGuildOwnerCanUse_Title'),
+              )
+              .setDescription(
+                Language.get(
+                  locale,
+                  'Embed_Warn_OnlyGuildOwnerCanUse_Description',
+                ),
+              )
+              .setColor(EmbedConfig.WARN_COLOR)
+              .setFooter({
+                text: user.tag,
+                iconURL: user.avatarURL() || undefined,
+              })
+              .setTimestamp(),
+          ],
+          allowedMentions: { parse: [] },
+          ...('locale' in data && {
+            flags: MessageFlags.Ephemeral,
+          }),
+        },
       };
 
-    return null;
+    return { status: true };
   }
 }

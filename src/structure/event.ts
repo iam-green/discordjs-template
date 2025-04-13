@@ -31,6 +31,12 @@ export type ExtendedEventType<
     only_guild: InGuild;
 
     /**
+     * Whether the event is only available in development
+     * @default false
+     */
+    only_development: boolean;
+
+    /**
      * Set specific guilds to use the event
      * * Configures the event to be usable only in the specified guilds.
      */
@@ -117,7 +123,11 @@ export class ExtendedEvent<
       const content = await import(path);
       for (const key of Object.keys(content))
         if (content[key] instanceof ExtendedEvent)
-          this.events.set({ path, function_name: key }, content[key].data);
+          if (
+            process.env.NODE_ENV != 'production' ||
+            !content[key].data.options?.only_development
+          )
+            this.events.set({ path, function_name: key }, content[key].data);
     }
   }
 
