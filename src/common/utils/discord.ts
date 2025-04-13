@@ -83,21 +83,29 @@ export class DiscordUtil {
       );
     }
 
-    await client.cluster.broadcastEval(
-      async (client, { channel_id, message }) => {
-        const channel = await client.channels.fetch(channel_id);
-        if (!channel?.isSendable()) return;
-        if (typeof message != 'string' && message.files) {
-          message.files = message.files.map((file: any) =>
-            file.encoding == 'base64' && typeof file.attachment == 'string'
-              ? { ...file, attachment: Buffer.from(file.attachment, 'base64') }
-              : file,
-          );
-        }
-        return channel.send(message as any);
-      },
-      { context: { channel_id, message } },
-    );
+    const result = await client.cluster
+      .broadcastEval(
+        async (client, { channel_id, message }) => {
+          const channel = await client.channels.fetch(channel_id);
+          if (!channel?.isSendable()) return;
+          if (typeof message != 'string' && message.files) {
+            message.files = message.files.map((file: any) =>
+              file.encoding == 'base64' && typeof file.attachment == 'string'
+                ? {
+                    ...file,
+                    attachment: Buffer.from(file.attachment, 'base64'),
+                  }
+                : file,
+            );
+          }
+          const result = await channel.send(message as any);
+          return result.id;
+        },
+        { context: { channel_id, message } },
+      )
+      .catch(client.error);
+
+    return (result ?? []).find((v) => v);
   }
 
   static convertPermissionToString(
