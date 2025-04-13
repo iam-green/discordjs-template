@@ -4,7 +4,7 @@ import { Log } from '@/common';
 import { Client } from 'pg';
 import * as schema from './schema';
 
-const client = new Client(process.env.DATABASE_URL || '');
+const client = new Client(process.env.DATABASE_URL ?? '');
 
 export const databaseInit = async () => {
   if (!process.env.DATABASE_URL) return;

@@ -353,7 +353,7 @@ export class ExtendedClient extends Client {
               .setColor(EmbedConfig.WARN_COLOR)
               .setFooter({
                 text: user.tag,
-                iconURL: user.avatarURL() || undefined,
+                iconURL: user.avatarURL() ?? undefined,
               })
               .setTimestamp(),
           ],
@@ -390,7 +390,7 @@ export class ExtendedClient extends Client {
                 .setColor(EmbedConfig.WARN_COLOR)
                 .setFooter({
                   text: user.tag,
-                  iconURL: user.avatarURL() || undefined,
+                  iconURL: user.avatarURL() ?? undefined,
                 })
                 .setTimestamp(),
             ],
@@ -439,7 +439,7 @@ export class ExtendedClient extends Client {
                 .setColor(EmbedConfig.WARN_COLOR)
                 .setFooter({
                   text: user.tag,
-                  iconURL: user.avatarURL() || undefined,
+                  iconURL: user.avatarURL() ?? undefined,
                 })
                 .setTimestamp(),
             ],
@@ -475,7 +475,7 @@ export class ExtendedClient extends Client {
               .setColor(EmbedConfig.WARN_COLOR)
               .setFooter({
                 text: user.tag,
-                iconURL: user.avatarURL() || undefined,
+                iconURL: user.avatarURL() ?? undefined,
               })
               .setTimestamp(),
           ],
@@ -504,7 +504,7 @@ export class ExtendedClient extends Client {
               .setColor(EmbedConfig.WARN_COLOR)
               .setFooter({
                 text: user.tag,
-                iconURL: user.avatarURL() || undefined,
+                iconURL: user.avatarURL() ?? undefined,
               })
               .setTimestamp(),
           ],

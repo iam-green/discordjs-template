@@ -80,7 +80,7 @@ export class Voice {
       inlineVolume: true,
     });
     voice.resource.volume?.setVolume(
-      (option.volume || 1) * (voice.option?.volume || 1),
+      (option.volume ?? 1) * (voice.option?.volume ?? 1),
     );
     voice.player?.play(voice.resource);
     (voice.voice as any)?.setMaxListeners(0);
@@ -137,7 +137,7 @@ export class Voice {
       if (voice.option?.repeat) voice.queue.push(voice.queue[0]);
       voice.queue.shift();
       voice.queue.sort(
-        (a, b) => +(a.date || new Date(0)) - +(b.date || new Date(0)),
+        (a, b) => +(a.date ?? new Date(0)) - +(b.date ?? new Date(0)),
       );
       if (voice.queue.length > 0) await this.subscribe(guild_id, option);
       voice.status.adding = false;
@@ -177,7 +177,7 @@ export class Voice {
     if (!voice) return;
     if (!voice.option) voice.option = {};
     voice.option.volume = volume;
-    voice.resource?.volume?.setVolume((voice.queue[0].volume || 1) * volume);
+    voice.resource?.volume?.setVolume((voice.queue[0].volume ?? 1) * volume);
   }
 
   static stop(guild_id: string) {
