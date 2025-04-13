@@ -21,7 +21,7 @@ import { ExtendedEvent } from './event';
 import { ExtendedComponent } from './component';
 import { ExtendedTextCommand } from './text_command';
 import { ExtendedApplicationCommand } from './application_command';
-import { DiscordUtil, Log, ValueOrArray } from '@/common';
+import { DiscordUtil, Log, toArray, ValueOrArray } from '@/common';
 import { BotConfig, EmbedConfig } from '@/config';
 
 export class ExtendedClient extends Client {
@@ -320,6 +320,12 @@ export class ExtendedClient extends Client {
 
     const data = interaction ?? message;
     if (!data) return { status: false };
+
+    if (
+      options?.guild_id &&
+      toArray(options.guild_id).includes(data.guild?.id ?? '')
+    )
+      return { status: false };
 
     const locale =
       'locale' in data
