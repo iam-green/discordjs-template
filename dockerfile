@@ -1,4 +1,4 @@
-FROM node:lts AS base
+FROM node:lts-slim AS base
 
 # Install Packages
 RUN apt-get update && \
@@ -17,6 +17,6 @@ RUN pnpm run build
 # Run
 FROM base AS deploy
 WORKDIR /app
-ENV NODE_ENV production
+ENV NODE_ENV=production
 COPY --from=builder /app ./
 CMD ["pnpm", "start"]
