@@ -1,0 +1,8 @@
+{
+  "verbose": true,
+  "watch": ["src"],
+  "ext": "ts,js,json",
+  "ignore": ["node_modules", "dist"],
+  "exec": "npm run dev",
+  "env": { "NODE_ENV": "development" }
+}
