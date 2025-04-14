@@ -96,7 +96,7 @@ export type ExtendedTextCommandType<InGuild extends boolean> = {
    * * Write the code to execute the text command.
    * @param options You can retrieve client data, message data, user locale.
    */
-  run: (options: TextCommandRunOptions<InGuild>) => Promise<void>;
+  run: (options: TextCommandRunOptions<InGuild>) => Promise<any>;
 };
 
 export type ExtendedTextCommnadMapKey = {
