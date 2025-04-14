@@ -49,12 +49,10 @@ export class ExtendedClient extends Client {
   async start() {
     await DiscordUtil.refresh();
     await Language.init();
-    await ExtendedEvent.init(BotConfig.EVENT_FOLDERS);
-    await ExtendedComponent.init(BotConfig.COMPONENT_FOLDERS);
-    await ExtendedTextCommand.init(BotConfig.TEXT_COMMAND_FOLDERS);
-    await ExtendedApplicationCommand.init(
-      BotConfig.APPLICATION_COMMAND_FOLDERS,
-    );
+    await ExtendedEvent.init();
+    await ExtendedComponent.init();
+    await ExtendedTextCommand.init();
+    await ExtendedApplicationCommand.init();
     await this.registerModules();
     await this.login(process.env.BOT_TOKEN);
     this.log.info(chalk`Logged in as {green ${this.user?.tag}}!`);

@@ -266,7 +266,7 @@ export type ExtendedApplicationCommnadType<
    * * Write the code to execute the command.
    * @param options You can retrieve client data, interaction data, and command arguments.
    */
-  run: (options: ApplicationCommmandRunOptions<InGuild>) => Promise<void>;
+  run: (options: ApplicationCommmandRunOptions<InGuild>) => Promise<any>;
 
   /**
    * Code to execute the autocomplete
@@ -275,7 +275,7 @@ export type ExtendedApplicationCommnadType<
    */
   autocomplete?: IsChatInput<
     Type,
-    (options: AutocompleteOptions<InGuild>) => Promise<void>
+    (options: AutocompleteOptions<InGuild>) => Promise<any>
   >;
 };
 
@@ -306,9 +306,7 @@ export class ExtendedApplicationCommand<
    * Initialize the command
    * @param folders Folders to search for commands
    */
-  static async init(
-    folders: string[] = ['command', 'context', 'commands', 'contexts'],
-  ) {
+  static async init(folders: string[] = BotConfig.APPLICATION_COMMAND_FOLDERS) {
     const commands = await glob(
       `${sep(__dirname)}/../{${folders.join(',')}}/**/*.{ts,js}`,
     );
@@ -659,7 +657,7 @@ export class ExtendedApplicationCommand<
   }
 
   static async registerCommand() {
-    if (!process.env.BOT_TOKEN) throw new Error('BOT_TOKEN is missing');;
+    if (!process.env.BOT_TOKEN) throw new Error('BOT_TOKEN is missing');
     const rest = new REST().setToken(process.env.BOT_TOKEN);
     const command_filtered = new Map(
       [...this.commands].filter(([k]) => !k.guild_id),
@@ -671,7 +669,7 @@ export class ExtendedApplicationCommand<
   }
 
   static async registerGuildCommand() {
-    if (!process.env.BOT_TOKEN) throw new Error('BOT_TOKEN is missing');;
+    if (!process.env.BOT_TOKEN) throw new Error('BOT_TOKEN is missing');
     const rest = new REST().setToken(process.env.BOT_TOKEN);
     const command_filtered = new Map(
       [...this.commands].filter(([k]) => k.guild_id),

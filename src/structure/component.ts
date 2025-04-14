@@ -29,6 +29,7 @@ import { GuildInteraction, Log, sep } from '@/common';
 import { randomUUID } from 'crypto';
 import { glob } from 'glob';
 import chalk from 'chalk';
+import { BotConfig } from '@/config';
 
 export type SupportComponentType =
   | ComponentType.Button
@@ -295,7 +296,7 @@ ExtendedComponent.removeExpired = () => {
  * @param folders Folders to search for components
  */
 ExtendedComponent.init = async (
-  folders: string[] = ['component', 'components'],
+  folders: string[] = BotConfig.COMPONENT_FOLDERS,
 ) => {
   const components = await glob(
     `${sep(__dirname)}/../{${folders.join(',')}}/**/*.{ts,js}`,

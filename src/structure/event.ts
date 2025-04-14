@@ -3,6 +3,7 @@ import { ExtendedClient } from './client';
 import { glob } from 'glob';
 import { Log, sep, ValueOrArray } from '@/common';
 import chalk from 'chalk';
+import { BotConfig } from '@/config';
 
 export type ExtendedEventType<
   Key extends keyof ClientEvents,
@@ -115,7 +116,7 @@ export class ExtendedEvent<
    * Initialize the event
    * @param folders Folders to search for events
    */
-  static async init(folders: string[] = ['event', 'events']) {
+  static async init(folders: string[] = BotConfig.EVENT_FOLDERS) {
     const events = await glob(
       `${sep(__dirname)}/../{${folders.join(',')}}/**/*{.ts,.js}`,
     );

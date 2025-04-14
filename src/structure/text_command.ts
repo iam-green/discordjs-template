@@ -3,6 +3,7 @@ import { Locale, Message, PermissionResolvable } from 'discord.js';
 import { ExtendedClient } from './client';
 import { glob } from 'glob';
 import chalk from 'chalk';
+import { BotConfig } from '@/config';
 
 export type TextCommandRunOptions<InGuild extends boolean> = {
   client: ExtendedClient;
@@ -119,14 +120,7 @@ export class ExtendedTextCommand<InGuild extends boolean> {
    * Initialize the text command
    * @param folders Folders to search for text commands
    */
-  static async init(
-    folders: string[] = [
-      'text_command',
-      'text_commands',
-      'textCommand',
-      'textCommands',
-    ],
-  ) {
+  static async init(folders: string[] = BotConfig.TEXT_COMMAND_FOLDERS) {
     const commands = await glob(
       `${sep(__dirname)}/../{${folders.join(',')}}/**/*.{ts,js}`,
     );
