@@ -27,7 +27,9 @@ export class DiscordUtil {
       ? await (
           await fetch(
             `${RouteBases.api}/teams/${result.team.id}/applications`,
-            { headers: { Authorization: process.env.DISCORD_USER_TOKEN ?? '' } },
+            {
+              headers: { Authorization: process.env.DISCORD_USER_TOKEN ?? '' },
+            },
           )
         ).json()
       : null;
@@ -89,7 +91,9 @@ export class DiscordUtil {
     const result = await client.cluster
       .broadcastEval(
         async (client, { channel_id, message }) => {
-          const channel = await client.channels.fetch(channel_id);
+          const channel =
+            client.channels.cache.get(channel_id) ??
+            (await client.channels.fetch(channel_id).catch(() => null));
           if (!channel?.isSendable()) return;
           if (typeof message != 'string' && message.files) {
             message.files = message.files.map((file: any) =>
