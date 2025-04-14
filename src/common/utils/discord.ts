@@ -25,7 +25,10 @@ export class DiscordUtil {
     const result: any = await rest.get(Routes.currentApplication());
     const team = result.team
       ? await (
-          await fetch(`${RouteBases.api}/teams/${result.team.id}/applications`)
+          await fetch(
+            `${RouteBases.api}/teams/${result.team.id}/applications`,
+            { headers: { Authorization: process.env.DISCORD_USER_TOKEN ?? '' } },
+          )
         ).json()
       : null;
 
