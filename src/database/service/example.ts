@@ -1,7 +1,13 @@
 import { and, asc, between, desc, eq } from 'drizzle-orm';
 import { db } from '..';
-import { CreateExampleDto, FindExampleDto, UpdateExampleDto } from '../types';
+import {
+  CreateExampleDto,
+  ExampleDto,
+  FindExampleDto,
+  UpdateExampleDto,
+} from '../types';
 import { example } from '../schema';
+import { Cache } from '@/common';
 
 export class ExampleService {
   static async find(data: FindExampleDto) {
@@ -14,7 +20,11 @@ export class ExampleService {
       from = 0,
       to = Date.now(),
     } = data;
-    return await db.query.example.findMany({
+    const cache = Cache.get<ExampleDto[]>(
+      'database:example:find:' + JSON.stringify(data),
+    );
+    if (cache) return cache;
+    const result = await db.query.example.findMany({
       where: and(
         id ? eq(example.id, id) : undefined,
         created
@@ -25,27 +35,38 @@ export class ExampleService {
       offset: (page - 1) * limit,
       limit,
     });
+    Cache.set('database:example:find:' + JSON.stringify(data), result);
+    return result;
   }
 
   static async get(id: string) {
-    return await db.query.example.findFirst({
+    const cache = Cache.get<ExampleDto>('database:example:get:' + id);
+    if (cache) return cache;
+    const result = await db.query.example.findFirst({
       where: eq(example.id, id),
     });
+    if (result) Cache.set('database:example:get:' + id, result);
+    return result;
   }
 
   static async create(data: CreateExampleDto) {
-    return (
+    const result = (
       await db.insert(example).values(data).onConflictDoNothing().returning()
     )[0];
+    Cache.set('database:example:get:' + result.id, result);
+    return result;
   }
 
   static async update(id: string, data: UpdateExampleDto) {
-    return (
+    const result = (
       await db.update(example).set(data).where(eq(example.id, id)).returning()
     )[0];
+    Cache.set('database:example:get:' + result.id, result);
+    return result;
   }
 
   static async delete(id: string) {
     await db.delete(example).where(eq(example.id, id));
+    Cache.remove('database:example:get:' + id);
   }
 }
