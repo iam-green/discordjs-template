@@ -15,9 +15,9 @@ export class Cluster {
         mode:
           process.env.NODE_ENV != 'production' ? 'worker' : ClusterConfig.mode,
         execArgv: [
+          ...(is_ts ? ['-r', '@swc-node/register'] : []),
           '-r',
           'tsconfig-paths/register',
-          ...(is_ts ? ['-r', 'ts-node/register'] : []),
         ],
       },
     );
