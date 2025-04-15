@@ -25,6 +25,7 @@ import {
   REST,
   Routes,
   Locale,
+  CommandInteractionOptionResolver,
 } from 'discord.js';
 import { ExtendedClient } from './client';
 import { glob } from 'glob';
@@ -85,7 +86,10 @@ export type ApplicationCommandsJSONBody =
   | RESTPostAPIChatInputApplicationCommandsJSONBody
   | RESTPostAPIContextMenuApplicationCommandsJSONBody;
 
-export type ApplicationCommmandRunOptions<InGuild extends boolean> = {
+export type ApplicationCommmandRunOptions<
+  Type extends AllowApplicationCommandType,
+  InGuild extends boolean,
+> = {
   /**
    * Discord Client
    */
@@ -102,10 +106,9 @@ export type ApplicationCommmandRunOptions<InGuild extends boolean> = {
   /**
    * Command Arguments
    */
-  args: ApplicationCommandInteraction<
-    AllowApplicationCommandType,
-    InGuild
-  >['options'];
+  args: Type extends ApplicationCommandType.ChatInput
+    ? CommandInteractionOptionResolver
+    : undefined;
 };
 
 export type AutocompleteOptions<InGuild extends boolean> = {
@@ -266,7 +269,7 @@ export type ExtendedApplicationCommnadType<
    * * Write the code to execute the command.
    * @param options You can retrieve client data, interaction data, and command arguments.
    */
-  run: (options: ApplicationCommmandRunOptions<InGuild>) => Promise<any>;
+  run: (options: ApplicationCommmandRunOptions<Type, InGuild>) => Promise<any>;
 
   /**
    * Code to execute the autocomplete

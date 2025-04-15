@@ -6,6 +6,7 @@ import {
   ChannelType,
   Client,
   ClientOptions,
+  CommandInteractionOptionResolver,
   EmbedBuilder,
   Events,
   Interaction,
@@ -122,7 +123,14 @@ export class ExtendedClient extends Client {
 
       Promise.resolve()
         .then(() =>
-          command.run({ client: this, interaction, args: interaction.options }),
+          command.run({
+            client: this,
+            interaction,
+            args:
+              command.type == ApplicationCommandType.ChatInput
+                ? (interaction.options as CommandInteractionOptionResolver)
+                : undefined,
+          }),
         )
         .catch(this.error);
     });
