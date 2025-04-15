@@ -280,7 +280,7 @@ export const ExtendedComponent = <
     },
     data,
   );
-  return Object.assign(component, { data });
+  return Object.assign(component, { component_data: data });
 };
 
 ExtendedComponent.components = new Map() as ExtendedComponentMap;
@@ -307,11 +307,11 @@ ExtendedComponent.init = async (
       if (typeof content[key] == 'function') continue;
       if (
         process.env.NODE_ENV == 'production' &&
-        content[key]?.data?.options?.only_development
+        content[key]?.component_data?.options?.only_development
       )
         continue;
-      if (content[key]?.data?.random_id) continue;
-      const data = content[key].data as ExtendedComponentType<
+      if (content[key]?.component_data?.random_id) continue;
+      const data = content[key].component_data as ExtendedComponentType<
         SupportComponentType,
         boolean
       >;
