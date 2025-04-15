@@ -31,45 +31,45 @@ export class Log {
   }
 
   static prefix(type: string, color: string) {
-    return chalk`{cyan [}{${color} ${type}}{cyan ]} {cyan (}{yellow ${this.date()}}{cyan )}`;
+    return chalk`{cyan [}{${color} ${type}}{cyan ]} {cyan (}{yellow ${Log.date()}}{cyan )}`;
   }
 
   static info(...content: any[]) {
     const result = [
-      this.prefix('INFO', 'green'),
+      Log.prefix('INFO', 'green'),
       ...content.map((v) =>
         typeof v == 'string' ? v.replace(/\n/g, '\n\t') : v,
       ),
     ];
     console.log(...result);
-    if (process.env.SAVE_LOGS == 'true') this.write('info', ...result);
+    if (process.env.SAVE_LOGS == 'true') Log.write('info', ...result);
   }
 
   static debug(...content: any[]) {
     const result = [
-      this.prefix('DEBUG', 'magenta'),
+      Log.prefix('DEBUG', 'magenta'),
       ...content.map((v) =>
         typeof v == 'string' ? v.replace(/\n/g, '\n\t') : v,
       ),
     ];
     if (process.env.NODE_ENV == 'development') console.log(...result);
-    if (process.env.SAVE_LOGS == 'true') this.write('debug', ...result);
+    if (process.env.SAVE_LOGS == 'true') Log.write('debug', ...result);
   }
 
   static warn(...content: any[]) {
     const result = [
-      this.prefix('WARN', 'yellow'),
+      Log.prefix('WARN', 'yellow'),
       ...content.map((v) =>
         typeof v == 'string' ? v.replace(/\n/g, '\n\t') : v,
       ),
     ];
     console.warn(...result);
-    if (process.env.SAVE_LOGS == 'true') this.write('warn', ...result);
+    if (process.env.SAVE_LOGS == 'true') Log.write('warn', ...result);
   }
 
   static error(...content: any[]) {
     const result = [
-      this.prefix('ERROR', 'red'),
+      Log.prefix('ERROR', 'red'),
       ...content.map((v, i) =>
         v instanceof Error
           ? chalk.red(
@@ -84,6 +84,6 @@ export class Log {
       ),
     ];
     console.error(...result);
-    if (process.env.SAVE_LOGS == 'true') this.write('error', ...result);
+    if (process.env.SAVE_LOGS == 'true') Log.write('error', ...result);
   }
 }
