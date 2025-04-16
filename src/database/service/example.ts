@@ -68,6 +68,7 @@ export class ExampleService {
     const result = (
       await db.update(example).set(data).where(eq(example.id, id)).returning()
     )[0];
+    await Cache.invalidateTag(this.cacheId(id));
     await Cache.set(this.cacheId(result.id), result, [this.cacheId(result.id)]);
     return result;
   }
