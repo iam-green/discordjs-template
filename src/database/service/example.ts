@@ -11,6 +11,8 @@ import { Cache } from '@/common';
 
 export class ExampleService {
   private static cacheId = (id: string) => 'database:example:get:' + id;
+  private static findCacheId = (data: FindExampleDto) =>
+    'database:example:find:' + JSON.stringify(data);
 
   static async find(data: FindExampleDto) {
     const {
@@ -22,9 +24,7 @@ export class ExampleService {
       from = 0,
       to = Date.now(),
     } = data;
-    const cache = Cache.get<ExampleDto[]>(
-      'database:example:find:' + JSON.stringify(data),
-    );
+    const cache = await Cache.get<ExampleDto[]>(this.findCacheId(data));
     if (cache) return cache;
     const result = await db.query.example.findMany({
       where: and(
@@ -38,22 +38,21 @@ export class ExampleService {
       limit,
     });
     if (result.length)
-      Cache.set(
-        'database:example:find:' + JSON.stringify(data),
+      await Cache.set(
+        this.findCacheId(data),
         result,
         result.map((v) => this.cacheId(v.id)),
       );
-
     return result;
   }
 
   static async get(id: string) {
-    const cache = Cache.get<ExampleDto>('database:example:get:' + id);
+    const cache = await Cache.get<ExampleDto>(this.cacheId(id));
     if (cache) return cache;
     const result = await db.query.example.findFirst({
       where: eq(example.id, id),
     });
-    if (result) Cache.set(this.cacheId(id), result, [this.cacheId(id)]);
+    if (result) await Cache.set(this.cacheId(id), result, [this.cacheId(id)]);
     return result;
   }
 
@@ -61,7 +60,7 @@ export class ExampleService {
     const result = (
       await db.insert(example).values(data).onConflictDoNothing().returning()
     )[0];
-    Cache.set(this.cacheId(result.id), result, [this.cacheId(result.id)]);
+    await Cache.set(this.cacheId(result.id), result, [this.cacheId(result.id)]);
     return result;
   }
 
@@ -69,12 +68,12 @@ export class ExampleService {
     const result = (
       await db.update(example).set(data).where(eq(example.id, id)).returning()
     )[0];
-    Cache.set(this.cacheId(result.id), result, [this.cacheId(result.id)]);
+    await Cache.set(this.cacheId(result.id), result, [this.cacheId(result.id)]);
     return result;
   }
 
   static async delete(id: string) {
     await db.delete(example).where(eq(example.id, id));
-    Cache.invalidateTag(this.cacheId(id));
+    await Cache.invalidateTag(this.cacheId(id));
   }
 }
