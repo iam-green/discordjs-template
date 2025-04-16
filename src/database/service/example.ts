@@ -10,6 +10,8 @@ import { example } from '../schema';
 import { Cache } from '@/common';
 
 export class ExampleService {
+  private static cacheId = (id: string) => 'database:example:get:' + id;
+
   static async find(data: FindExampleDto) {
     const {
       id,
@@ -35,7 +37,13 @@ export class ExampleService {
       offset: (page - 1) * limit,
       limit,
     });
-    Cache.set('database:example:find:' + JSON.stringify(data), result);
+    if (result.length)
+      Cache.set(
+        'database:example:find:' + JSON.stringify(data),
+        result,
+        result.map((v) => this.cacheId(v.id)),
+      );
+
     return result;
   }
 
@@ -45,7 +53,7 @@ export class ExampleService {
     const result = await db.query.example.findFirst({
       where: eq(example.id, id),
     });
-    if (result) Cache.set('database:example:get:' + id, result);
+    if (result) Cache.set(this.cacheId(id), result, [this.cacheId(id)]);
     return result;
   }
 
@@ -53,7 +61,7 @@ export class ExampleService {
     const result = (
       await db.insert(example).values(data).onConflictDoNothing().returning()
     )[0];
-    Cache.set('database:example:get:' + result.id, result);
+    Cache.set(this.cacheId(result.id), result, [this.cacheId(result.id)]);
     return result;
   }
 
@@ -61,12 +69,12 @@ export class ExampleService {
     const result = (
       await db.update(example).set(data).where(eq(example.id, id)).returning()
     )[0];
-    Cache.set('database:example:get:' + result.id, result);
+    Cache.set(this.cacheId(result.id), result, [this.cacheId(result.id)]);
     return result;
   }
 
   static async delete(id: string) {
     await db.delete(example).where(eq(example.id, id));
-    Cache.remove('database:example:get:' + id);
+    Cache.invalidateTag(this.cacheId(id));
   }
 }
