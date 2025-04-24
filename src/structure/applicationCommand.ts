@@ -155,7 +155,7 @@ export type ExtendedApplicationCommnadType<
    * @example 'Ping Command'
    * @example ['Ping Command', 'Pong Command']
    */
-  description: IsChatInput<Type, ValueOrArray<string>>;
+  description?: IsChatInput<Type, ValueOrArray<string>>;
 
   /**
    * Command Description for Command Parent
