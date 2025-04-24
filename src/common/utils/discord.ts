@@ -12,11 +12,11 @@ import { toArray } from './array';
 import { streamToBuffer } from './stream';
 
 export class DiscordUtil {
-  static client_id = '';
-  static other_client_id = '';
-  static admin_id: string[] = [];
-  static developer_id: string[] = [];
-  static command_id: Record<string, string> = {};
+  static clientId = '';
+  static otherClientId: string[] = [];
+  static adminId: string[] = [];
+  static developerId: string[] = [];
+  static commandId: Record<string, string> = {};
 
   static async refresh() {
     if (!process.env.BOT_TOKEN) throw new Error('BOT_TOKEN is missing');
@@ -34,33 +34,33 @@ export class DiscordUtil {
         ).json()
       : null;
 
-    this.client_id = result.id;
-    this.admin_id = result.team
+    this.clientId = result.id;
+    this.adminId = result.team
       ? result.team.members
           .filter((v) => v.role == 'admin')
           .map((v) => v.user.id as string)
       : [result.owner.id as string];
-    this.developer_id = result.team
+    this.developerId = result.team
       ? result.team.members
           .filter((v) => v.role == 'developer')
           .map((v) => v.user.id as string)
       : [];
-    this.other_client_id =
+    this.otherClientId =
       result.team && process.env.DISCORD_USER_TOKEN
         ? team.map((v) => v.id).filter((v) => v != result.id)
         : [];
-    this.command_id = (
-      (await rest.get(Routes.applicationCommands(this.client_id))) as any[]
+    this.commandId = (
+      (await rest.get(Routes.applicationCommands(this.clientId))) as any[]
     ).reduce((a, b) => ({ ...a, [b.name]: b.id }), {});
   }
 
   static commandMention(name: string) {
-    return `</${name}:${this.command_id[name.split(' ')[0]] ?? 0}>`;
+    return `</${name}:${this.commandId[name.split(' ')[0]] ?? 0}>`;
   }
 
   static async send(
     client: ExtendedClient,
-    channel_id: string,
+    channelId: string,
     message: string | MessageCreateOptions,
   ) {
     if (typeof message != 'string' && message.files) {
@@ -90,10 +90,10 @@ export class DiscordUtil {
 
     const result = await client.cluster
       .broadcastEval(
-        async (client, { channel_id, message }) => {
+        async (client, { channelId, message }) => {
           const channel =
-            client.channels.cache.get(channel_id) ??
-            (await client.channels.fetch(channel_id).catch(() => null));
+            client.channels.cache.get(channelId) ??
+            (await client.channels.fetch(channelId).catch(() => null));
           if (!channel?.isSendable()) return;
           if (typeof message != 'string' && message.files) {
             message.files = message.files.map((file: any) =>
@@ -108,7 +108,7 @@ export class DiscordUtil {
           const result = await channel.send(message as any);
           return result.id;
         },
-        { context: { channel_id, message } },
+        { context: { channelId, message } },
       )
       .catch(client.error);
 
@@ -128,9 +128,9 @@ export class DiscordUtil {
   }
 
   static checkPermission(
-    member_permission?: Readonly<PermissionsBitField> | null,
-    ...need_permission: PermissionResolvable[]
+    memberPermission?: Readonly<PermissionsBitField> | null,
+    ...needPermission: PermissionResolvable[]
   ) {
-    return need_permission.filter((v) => !member_permission?.has(v));
+    return needPermission.filter((v) => !memberPermission?.has(v));
   }
 }

@@ -20,8 +20,8 @@ import {
 import { Language, LanguageData } from './language';
 import { ExtendedEvent } from './event';
 import { ExtendedComponent } from './component';
-import { ExtendedTextCommand } from './text_command';
-import { ExtendedApplicationCommand } from './application_command';
+import { ExtendedTextCommand } from './textCommand';
+import { ExtendedApplicationCommand } from './applicationCommand';
 import { DiscordUtil, Log, toArray, ValueOrArray } from '@/common';
 import { BotConfig, EmbedConfig } from '@/config';
 
@@ -104,17 +104,17 @@ export class ExtendedClient extends Client {
             .join(' ')
         : interaction.commandName;
 
-      const command_key = [...ExtendedApplicationCommand.commands.keys()].find(
+      const commandKey = [...ExtendedApplicationCommand.commands.keys()].find(
         (v) => v.type == type && v.name.includes(name),
       );
-      if (!command_key) return;
+      if (!commandKey) return;
 
-      const command = ExtendedApplicationCommand.commands.get(command_key);
+      const command = ExtendedApplicationCommand.commands.get(commandKey);
       if (!command) return;
 
       const validate = this.checkOptions({
         interaction,
-        command_name: null,
+        commandName: null,
         options: command.options,
       });
       if (!validate.status)
@@ -144,17 +144,17 @@ export class ExtendedClient extends Client {
 
       ExtendedComponent.removeExpired();
 
-      const component_key = [...ExtendedComponent.components.keys()].find(
+      const componentKey = [...ExtendedComponent.components.keys()].find(
         (v) => interaction.customId == v.id,
       );
-      if (!component_key) return;
+      if (!componentKey) return;
 
-      const component = ExtendedComponent.components.get(component_key);
+      const component = ExtendedComponent.components.get(componentKey);
       if (!component) return;
 
       const validate = this.checkOptions({
         interaction,
-        command_name: null,
+        commandName: null,
         options: component.options,
       });
       if (!validate.status)
@@ -168,15 +168,15 @@ export class ExtendedClient extends Client {
       if (component.options?.expire) {
         ExtendedComponent.components.set(
           {
-            ...component_key,
-            expire_time: Date.now() + component.options.expire,
+            ...componentKey,
+            expireTime: Date.now() + component.options.expire,
           },
           component,
         );
-        ExtendedComponent.components.delete(component_key);
+        ExtendedComponent.components.delete(componentKey);
       }
 
-      if (component.once) ExtendedComponent.components.delete(component_key);
+      if (component.once) ExtendedComponent.components.delete(componentKey);
     });
   }
 
@@ -194,13 +194,13 @@ export class ExtendedClient extends Client {
         .filter((v) => v)
         .join(' ');
 
-      const command_key = [...ExtendedApplicationCommand.commands.keys()].find(
+      const commandKey = [...ExtendedApplicationCommand.commands.keys()].find(
         (v) =>
           v.type == ApplicationCommandType.ChatInput && v.name.includes(name),
       );
-      if (!command_key) return;
+      if (!commandKey) return;
 
-      const command = ExtendedApplicationCommand.commands.get(command_key);
+      const command = ExtendedApplicationCommand.commands.get(commandKey);
       if (!command) return;
 
       Promise.resolve()
@@ -225,14 +225,14 @@ export class ExtendedClient extends Client {
       if (!prefix) return;
 
       const content = message.content.slice(prefix.length).trim();
-      const command_key = [...ExtendedTextCommand.commands.keys()].find((v) =>
-        v.command_name
+      const commandKey = [...ExtendedTextCommand.commands.keys()].find((v) =>
+        v.commandName
           .sort((a, b) => b.length - a.length)
           .find((n) => content.startsWith(n)),
       );
-      if (!command_key) return;
+      if (!commandKey) return;
 
-      const command = ExtendedTextCommand.commands.get(command_key);
+      const command = ExtendedTextCommand.commands.get(commandKey);
       if (!command) return;
 
       if (
@@ -245,7 +245,7 @@ export class ExtendedClient extends Client {
 
       const validate = this.checkOptions({
         message,
-        command_name: command_key.command_name[0],
+        commandName: commandKey.commandName[0],
         options: command.options,
       });
       if (!validate.status)
@@ -281,7 +281,7 @@ export class ExtendedClient extends Client {
           if (data) {
             const validate = this.checkOptions({
               interaction: data,
-              command_name: event.event,
+              commandName: event.event,
               options: event.options,
             });
             if (!validate.status) return;
@@ -297,24 +297,24 @@ export class ExtendedClient extends Client {
   private checkOptions<T extends Interaction | Message>({
     interaction,
     message,
-    command_name,
+    commandName,
     options,
   }: {
     interaction?: T;
     message?: T;
-    command_name: T extends Message ? string : null;
+    commandName: T extends Message ? string : null;
     options?: Partial<{
-      only_guild: boolean;
-      only_development: boolean;
-      guild_id: ValueOrArray<string>;
+      onlyGuild: boolean;
+      onlyDevelopment: boolean;
+      guildId: ValueOrArray<string>;
       cooldown: number;
       permission: Partial<{
         user: ValueOrArray<PermissionResolvable>;
         bot: ValueOrArray<PermissionResolvable>;
       }>;
-      bot_admin: boolean;
-      bot_developer: boolean;
-      guild_owner: boolean;
+      botAdmin: boolean;
+      botDeveloper: boolean;
+      guildOwner: boolean;
     }>;
   }): {
     status: boolean;
@@ -322,15 +322,15 @@ export class ExtendedClient extends Client {
       ? InteractionReplyOptions
       : BaseMessageOptions;
   } {
-    if (process.env.NODE_ENV != 'production' && options?.only_development)
+    if (process.env.NODE_ENV != 'production' && options?.onlyDevelopment)
       return { status: false };
 
     const data = interaction ?? message;
     if (!data) return { status: false };
 
     if (
-      options?.guild_id &&
-      toArray(options.guild_id).includes(data.guild?.id ?? '')
+      options?.guildId &&
+      toArray(options.guildId).includes(data.guild?.id ?? '')
     )
       return { status: false };
 
@@ -339,10 +339,10 @@ export class ExtendedClient extends Client {
         ? data.locale
         : (this.locale.get(data.author.id) ?? BotConfig.DEFAULT_LANGUAGE);
     const user = 'user' in data ? data.user : data.author;
-    const cooldown_id =
-      'commandId' in data ? data.commandId : (command_name ?? '');
+    const cooldownId =
+      'commandId' in data ? data.commandId : (commandName ?? '');
 
-    if (options?.only_guild && !data.guild)
+    if (options?.onlyGuild && !data.guild)
       return {
         status: false,
         message: {
@@ -374,10 +374,10 @@ export class ExtendedClient extends Client {
     if (options?.cooldown) {
       const now = Date.now();
       if (!this.cooldown.has(user.id)) this.cooldown.set(user.id, new Map());
-      if (!this.cooldown.get(user.id)?.has(cooldown_id))
-        this.cooldown.get(user.id)?.set(cooldown_id, 0);
+      if (!this.cooldown.get(user.id)?.has(cooldownId))
+        this.cooldown.get(user.id)?.set(cooldownId, 0);
 
-      const cooldown = this.cooldown.get(user.id)?.get(cooldown_id) ?? 0;
+      const cooldown = this.cooldown.get(user.id)?.get(cooldownId) ?? 0;
       if (cooldown > now)
         return {
           status: false,
@@ -407,12 +407,12 @@ export class ExtendedClient extends Client {
             }),
           },
         };
-      this.cooldown[user.id][cooldown_id] = now + options.cooldown;
+      this.cooldown[user.id][cooldownId] = now + options.cooldown;
     }
 
     for (const target of ['bot', 'user']) {
       if (!options?.permission?.[target]) continue;
-      const need_permission = DiscordUtil.checkPermission(
+      const needPermission = DiscordUtil.checkPermission(
         target == 'user'
           ? 'memberPermissions' in data
             ? data.memberPermissions
@@ -420,7 +420,7 @@ export class ExtendedClient extends Client {
           : data.guild?.members.me?.permissions,
         options.permission[target],
       );
-      if (need_permission.length)
+      if (needPermission.length)
         return {
           status: false,
           message: {
@@ -437,7 +437,7 @@ export class ExtendedClient extends Client {
                     Language.get(
                       locale,
                       `Embed_Warn_NoPermission_${target}_Description` as keyof LanguageData,
-                      need_permission
+                      needPermission
                         .map((v) => DiscordUtil.convertPermissionToString(v))
                         .join('`, `'),
                     ) +
@@ -459,10 +459,10 @@ export class ExtendedClient extends Client {
     }
 
     if (
-      (options?.bot_admin || options?.bot_developer) &&
+      (options?.botAdmin || options?.botDeveloper) &&
       ![
-        ...(options?.bot_admin ? DiscordUtil.admin_id : []),
-        ...(options?.bot_developer ? DiscordUtil.developer_id : []),
+        ...(options?.botAdmin ? DiscordUtil.adminId : []),
+        ...(options?.botDeveloper ? DiscordUtil.developerId : []),
       ].includes(user.id)
     )
       return {
@@ -493,7 +493,7 @@ export class ExtendedClient extends Client {
         },
       };
 
-    if (options?.guild_owner && data.guild?.ownerId != user.id)
+    if (options?.guildOwner && data.guild?.ownerId != user.id)
       return {
         status: false,
         message: {

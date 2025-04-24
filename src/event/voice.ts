@@ -22,7 +22,7 @@ export default new ExtendedEvent({
 
     // Check if the bot is the only one in the voice channel or the bot has left the voice channel
     if (
-      (voice?.option?.auto_left &&
+      (voice?.option?.autoLeft &&
         oldState.channel?.members.has(client.user?.id ?? '') &&
         oldState.channel?.members.filter((v) => !v.user.bot).size == 0) ||
       (oldState.member?.id == client.user?.id &&

@@ -145,7 +145,7 @@ export type ExtendedComponentType<
   /**
    * Whether to randomly set the component ID
    */
-  random_id?: boolean;
+  randomId?: boolean;
 
   /**
    * Component attributes
@@ -158,19 +158,19 @@ export type ExtendedComponentType<
      * * If you enable this option, you can import guild-related information.
      * @default false
      */
-    only_guild: InGuild;
+    onlyGuild: InGuild;
 
     /**
      * Whether the component is only available in development
      * @default false
      */
-    only_development: boolean;
+    onlyDevelopment: boolean;
 
     /**
      * Set specific guilds to use the component
      * * Configures the component to be usable only in the specified guilds.
      */
-    guild_id: ValueOrArray<string>;
+    guildId: ValueOrArray<string>;
 
     /**
      * component Cooldown
@@ -202,21 +202,21 @@ export type ExtendedComponentType<
      * * Sets the component to be available only to bot administrators.
      * @default false
      */
-    bot_admin: boolean;
+    botAdmin: boolean;
 
     /**
      * Component for Bot Developers Only
      * * Sets the component to be available only to bot developers.
      * @default false
      */
-    bot_developer: boolean;
+    botDeveloper: boolean;
 
     /**
      * Component for Guild Owners Only
      * * Sets the component to be available only to guild owners.
      * @default false
      */
-    guild_owner: boolean;
+    guildOwner: boolean;
 
     /**
      * Component expiration time
@@ -235,11 +235,11 @@ export type ExtendedComponentType<
 
 export type ExtendedComponentMapKey = {
   path?: string;
-  function_name?: string;
+  functionName?: string;
   id: string;
   type: SupportComponentType;
   expire?: number;
-  expire_time?: number;
+  expireTime?: number;
 };
 
 export type ExtendedComponentMap = Map<
@@ -263,7 +263,7 @@ export const ExtendedComponent = <
 >(
   data: ExtendedComponentType<Type, InGuild>,
 ) => {
-  const id = data.id + ((data.random_id ?? true) ? '_' + generateUUID() : '');
+  const id = data.id + ((data.randomId ?? true) ? '_' + generateUUID() : '');
   const component = (
     data.component instanceof Function
       ? data.component(new ComponentBuilderMap[data.type]({ custom_id: id }))
@@ -274,13 +274,13 @@ export const ExtendedComponent = <
       id,
       type: data.type,
       expire: data.options?.expire,
-      expire_time: data.options?.expire
+      expireTime: data.options?.expire
         ? Date.now() + data.options?.expire
         : undefined,
     },
     data,
   );
-  return Object.assign(component, { component_data: data });
+  return Object.assign(component, { componentData: data });
 };
 
 ExtendedComponent.components = new Map() as ExtendedComponentMap;
@@ -307,22 +307,22 @@ ExtendedComponent.init = async (
       if (typeof content[key] == 'function') continue;
       if (
         process.env.NODE_ENV == 'production' &&
-        content[key]?.component_data?.options?.only_development
+        content[key]?.component_data?.options?.onlyDevelopment
       )
         continue;
-      if (content[key]?.component_data?.random_id) continue;
-      const data = content[key].component_data as ExtendedComponentType<
+      if (content[key]?.component_data?.randomId) continue;
+      const data = content[key].componentData as ExtendedComponentType<
         SupportComponentType,
         boolean
       >;
       ExtendedComponent.components.set(
         {
           path,
-          function_name: key,
+          functionName: key,
           id: data.id,
           type: data.type,
           expire: data.options?.expire,
-          expire_time: data.options?.expire
+          expireTime: data.options?.expire
             ? Date.now() + data.options?.expire
             : undefined,
         },
@@ -335,7 +335,7 @@ ExtendedComponent.init = async (
 ExtendedComponent.logComponents = () => {
   for (const {
     path,
-    function_name,
+    functionName: function_name,
     type,
   } of ExtendedComponent.components.keys())
     if (path && function_name)

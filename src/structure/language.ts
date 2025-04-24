@@ -7,7 +7,7 @@ import {
   SlashCommandStringOption,
 } from 'discord.js';
 import { glob } from 'glob';
-import { ExtendedApplicationCommnadType } from './application_command';
+import { ExtendedApplicationCommnadType } from './applicationCommand';
 
 export type LanguageData = typeof import('../languages/en-US.json');
 
@@ -15,21 +15,21 @@ export class Language {
   private static locale: Locale[] = [];
   private static data: Map<Partial<Locale>, LanguageData> = new Map();
 
-  static locales(include_default: boolean = true) {
+  static locales(includeDefault: boolean = true) {
     if (!this.locale.length)
       this.locale = glob
         .sync(`${sep(__dirname)}/../languages/*.json`)
         .map((path) => path.match(/languages\/(.*?)\.json$/)?.[1]) as Locale[];
 
     return this.locale.filter(
-      (v) => include_default || v != BotConfig.DEFAULT_LANGUAGE,
+      (v) => includeDefault || v != BotConfig.DEFAULT_LANGUAGE,
     );
   }
 
   static async init() {
-    const locale_list = Object.values(Locale).map((v) => v.toString());
+    const localeList = Object.values(Locale).map((v) => v.toString());
     for (const locale of this.locales())
-      if (locale_list.includes(locale))
+      if (localeList.includes(locale))
         this.data.set(
           locale,
           (await import(`../languages/${locale}.json`)).default,
@@ -82,21 +82,21 @@ export class Language {
   }
 
   static commandOption<T extends SharedNameAndDescription>(
-    command_name: string,
-    command_option: string,
+    commandName: string,
+    commandOption: string,
     option: T,
   ): T {
     return option
       .setName(
         Language.get(
           BotConfig.DEFAULT_LANGUAGE,
-          `Command_${command_name}_Option_${command_option}_Name` as keyof LanguageData,
+          `Command_${commandName}_Option_${commandOption}_Name` as keyof LanguageData,
         ),
       )
       .setDescription(
         Language.get(
           BotConfig.DEFAULT_LANGUAGE,
-          `Command_${command_name}_Option_${command_option}_Description` as keyof LanguageData,
+          `Command_${commandName}_Option_${commandOption}_Description` as keyof LanguageData,
         ),
       )
       .setNameLocalizations(
@@ -104,7 +104,7 @@ export class Language {
           .map((v) => ({
             [v]: Language.get(
               v,
-              `Command_${command_name}_Option_${command_option}_Name` as keyof LanguageData,
+              `Command_${commandName}_Option_${commandOption}_Name` as keyof LanguageData,
             ),
           }))
           .reduce((a, b) => ({ ...a, ...b })),
@@ -114,7 +114,7 @@ export class Language {
           .map((v) => ({
             [v]: Language.get(
               v,
-              `Command_${command_name}_Option_${command_option}_Description` as keyof LanguageData,
+              `Command_${commandName}_Option_${commandOption}_Description` as keyof LanguageData,
             ),
           }))
           .reduce((a, b) => ({ ...a, ...b })),
@@ -122,23 +122,23 @@ export class Language {
   }
 
   static commandOptionChoice(
-    command_name: string,
-    command_option: string,
-    command_choice: string[],
+    commandName: string,
+    commandOption: string,
+    commandChoice: string[],
     option: SlashCommandStringOption,
   ) {
-    return this.commandOption(command_name, command_option, option).addChoices(
-      command_choice.map((v) => ({
+    return this.commandOption(commandName, commandOption, option).addChoices(
+      commandChoice.map((v) => ({
         name: Language.get(
           BotConfig.DEFAULT_LANGUAGE,
-          `Command_${command_name}_Option_${command_option}_Choice_${v}` as keyof LanguageData,
+          `Command_${commandName}_Option_${commandOption}_Choice_${v}` as keyof LanguageData,
         ),
         value: v,
         name_localizations: Language.locales()
           .map((w) => ({
             [w]: Language.get(
               w,
-              `Command_${command_name}_Option_${command_option}_Choice_${v}` as keyof LanguageData,
+              `Command_${commandName}_Option_${commandOption}_Choice_${v}` as keyof LanguageData,
             ),
           }))
           .reduce((a, b) => ({ ...a, ...b })),

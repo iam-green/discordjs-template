@@ -29,19 +29,19 @@ export type ExtendedEventType<
      * * If you enable this option, you can import guild-related information.
      * @default false
      */
-    only_guild: InGuild;
+    onlyGuild: InGuild;
 
     /**
      * Whether the event is only available in development
      * @default false
      */
-    only_development: boolean;
+    onlyDevelopment: boolean;
 
     /**
      * Set specific guilds to use the event
      * * Configures the event to be usable only in the specified guilds.
      */
-    guild_id: ValueOrArray<string>;
+    guildId: ValueOrArray<string>;
 
     /**
      * Event Permissions
@@ -68,21 +68,21 @@ export type ExtendedEventType<
      * * Sets the event to be available only to bot administrators.
      * @default false
      */
-    bot_admin: boolean;
+    botAdmin: boolean;
 
     /**
      * Event for Bot Developers Only
      * * Sets the event to be available only to bot developers.
      * @default false
      */
-    bot_developer: boolean;
+    botDeveloper: boolean;
 
     /**
      * Event for Guild Owners Only
      * * Sets the event to be available only to guild owners.
      * @default false
      */
-    guild_owner: boolean;
+    guildOwner: boolean;
   }>;
 
   /**
@@ -96,7 +96,7 @@ export type ExtendedEventType<
 
 export type ExtendedEventMapKey = {
   path: string;
-  function_name: string;
+  functionName: string;
 };
 
 export type ExtendedEventMap = Map<
@@ -126,17 +126,17 @@ export class ExtendedEvent<
         if (content[key] instanceof ExtendedEvent)
           if (
             process.env.NODE_ENV != 'production' ||
-            !content[key].data.options?.only_development
+            !content[key].data.options?.onlyDevelopment
           )
-            this.events.set({ path, function_name: key }, content[key].data);
+            this.events.set({ path, functionName: key }, content[key].data);
     }
   }
 
   static async logEvents() {
-    for (const [{ path, function_name }, { event }] of this.events)
+    for (const [{ path, functionName }, { event }] of this.events)
       Log.debug(
         [
-          `Added ${chalk.green(event)} Event (Key : ${chalk.green(function_name)})`,
+          `Added ${chalk.green(event)} Event (Key : ${chalk.green(functionName)})`,
           `Location : ${chalk.yellow(path)})`,
         ].join('\n'),
       );

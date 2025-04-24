@@ -30,19 +30,19 @@ export type ExtendedTextCommandType<InGuild extends boolean> = {
      * * If you enable this option, you can import guild-related information.
      * @default false
      */
-    only_guild: InGuild;
+    onlyGuild: InGuild;
 
     /**
      * Whether the text command is only available in development
      * @default false
      */
-    only_development: boolean;
+    onlyDevelopment: boolean;
 
     /**
      * Set specific guilds to use the text command
      * * Configures the text command to be usable only in the specified guilds.
      */
-    guild_id: ValueOrArray<string>;
+    guildId: ValueOrArray<string>;
 
     /**
      * Text Command Cooldown
@@ -74,21 +74,21 @@ export type ExtendedTextCommandType<InGuild extends boolean> = {
      * * Sets the text command to be available only to bot administrators.
      * @default false
      */
-    bot_admin: boolean;
+    botAdmin: boolean;
 
     /**
      * Text Command for Bot Developers Only
      * * Sets the text command to be available only to bot developers.
      * @default false
      */
-    bot_developer: boolean;
+    botDeveloper: boolean;
 
     /**
      * Text Command for Guild Owners Only
      * * Sets the text command to be available only to guild owners.
      * @default false
      */
-    guild_owner: boolean;
+    guildOwner: boolean;
   }>;
 
   /**
@@ -101,9 +101,9 @@ export type ExtendedTextCommandType<InGuild extends boolean> = {
 
 export type ExtendedTextCommnadMapKey = {
   path: string;
-  function_name: string;
-  command_name: string[];
-  guild_id?: string[];
+  functionName: string;
+  commandName: string[];
+  guildId?: string[];
 };
 
 export type ExtendedTextCommnadMap = Map<
@@ -132,10 +132,10 @@ export class ExtendedTextCommand<InGuild extends boolean> {
           this.commands.set(
             {
               path: path,
-              function_name: key,
-              command_name: toArray(command.name),
-              guild_id: command.options?.guild_id
-                ? toArray(command.options.guild_id)
+              functionName: key,
+              commandName: toArray(command.name),
+              guildId: command.options?.guildId
+                ? toArray(command.options.guildId)
                 : undefined,
             },
             command,
@@ -148,22 +148,22 @@ export class ExtendedTextCommand<InGuild extends boolean> {
     for (const [key, command] of this.commands) {
       if (
         process.env.NODE_ENV == 'production' &&
-        command?.options?.only_development
+        command?.options?.onlyDevelopment
       )
         continue;
-      const names_sorted = toArray(command.name).sort(
+      const namesSorted = toArray(command.name).sort(
         (a, b) => b.split(' ').length - a.split(' ').length,
       );
-      for (const name of names_sorted) {
-        const guild_id = toArray(key.guild_id ?? []);
+      for (const name of namesSorted) {
+        const guildId = toArray(key.guildId ?? []);
         Log.debug(
           [
             `Added ${chalk.green(name)} Text Command for ${
-              guild_id.length ? chalk.cyan('Guild') : chalk.red('Global')
-            } (Key : ${chalk.green(key.function_name)}, Guild : ${
-              !guild_id.length
+              guildId.length ? chalk.cyan('Guild') : chalk.red('Global')
+            } (Key : ${chalk.green(key.functionName)}, Guild : ${
+              !guildId.length
                 ? chalk.red('None')
-                : guild_id.map((v) => chalk.cyan(v)).join(', ')
+                : guildId.map((v) => chalk.cyan(v)).join(', ')
             })`,
             `Location : ${chalk.yellow(key.path)}`,
           ].join('\n'),

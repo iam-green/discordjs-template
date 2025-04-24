@@ -162,8 +162,8 @@ export type ExtendedApplicationCommnadType<
    * * You can add descriptions to Subcommands and Subcommand Groups.
    * * If no value is provided, the default setting will be applied.
    */
-  parent_description?: Partial<
-    Record<'subcommand' | 'subcommand_group', ValueOrArray<LocalizationMap>>
+  parentDescription?: Partial<
+    Record<'subcommand' | 'subcommandGroup', ValueOrArray<LocalizationMap>>
   >;
 
   /**
@@ -194,19 +194,19 @@ export type ExtendedApplicationCommnadType<
      * * If you enable this option, you can import guild-related information.
      * @default false
      */
-    only_guild: InGuild;
+    onlyGuild: InGuild;
 
     /**
      * Whether the command is only available in development
      * @default false
      */
-    only_development: boolean;
+    onlyDevelopment: boolean;
 
     /**
      * Set specific guilds to use the command
      * * Configures the command to be usable only in the specified guilds.
      */
-    guild_id: ValueOrArray<string>;
+    guildId: ValueOrArray<string>;
 
     /**
      * Command Cooldown
@@ -223,7 +223,7 @@ export type ExtendedApplicationCommnadType<
       /**
        * User Permissions
        * * Permissions required for users to use the command.
-       * * If default_permission is enabled, the first value will be registered
+       * * If defaultPermission is enabled, the first value will be registered
        *   as the default permission for the slash command.
        */
       user: ValueOrArray<PermissionResolvable>;
@@ -239,7 +239,7 @@ export type ExtendedApplicationCommnadType<
        * * Default permissions are registered for slash commands.
        * * Allowing only users with the specified permissions or higher to use the command.
        */
-      default_permission: boolean;
+      defaultPermission: boolean;
     }>;
 
     /**
@@ -247,21 +247,21 @@ export type ExtendedApplicationCommnadType<
      * * Sets the command to be available only to bot administrators.
      * @default false
      */
-    bot_admin: boolean;
+    botAdmin: boolean;
 
     /**
      * Command for Bot Developers Only
      * * Sets the command to be available only to bot developers.
      * @default false
      */
-    bot_developer: boolean;
+    botDeveloper: boolean;
 
     /**
      * Command for Guild Owners Only
      * * Sets the command to be available only to guild owners.
      * @default false
      */
-    guild_owner: boolean;
+    guildOwner: boolean;
   }>;
 
   /**
@@ -285,9 +285,9 @@ export type ExtendedApplicationCommnadType<
 export type ExtendedApplicationCommnadMapKey = {
   path: string;
   type: AllowApplicationCommandType;
-  function_name: string;
+  functionName: string;
   name: string[];
-  guild_id?: string[];
+  guildId?: string[];
 };
 
 export type ExtendedApplicationCommnadMap = Map<
@@ -320,17 +320,17 @@ export class ExtendedApplicationCommand<
           const command = content[key].data;
           if (
             process.env.NODE_ENV == 'production' &&
-            command.options?.only_development
+            command.options?.onlyDevelopment
           )
             continue;
           this.commands.set(
             {
               path: path,
               type: command.type,
-              function_name: key,
+              functionName: key,
               name: toArray(command.name),
-              guild_id: command.options?.guild_id
-                ? toArray(command.options.guild_id)
+              guildId: command.options?.guildId
+                ? toArray(command.options.guildId)
                 : undefined,
             },
             command,
@@ -344,34 +344,34 @@ export class ExtendedApplicationCommand<
   >(
     type: Type,
     command: ExtendedApplicationCommnadType<Type, boolean>,
-    name_arg_text: string,
-    name_arg_idx?: IsChatInput<Type, number>,
+    nameArgText: string,
+    nameArgIdx?: IsChatInput<Type, number>,
   ):
     | Pick<
         ApplicationCommandJSON,
         'name_localizations' | 'description_localizations'
       >
     | undefined {
-    const is_chat_input = type == ApplicationCommandType.ChatInput;
+    const isChatInput = type == ApplicationCommandType.ChatInput;
 
     const name = toArray(command.name);
-    const name_localization = toArray(command.localization?.name ?? []);
-    let description_localization = toArray(
+    const nameLocalization = toArray(command.localization?.name ?? []);
+    let descriptionLocalization = toArray(
       command.localization?.description ?? [],
     );
 
-    if (!name_localization.length && !description_localization.length)
+    if (!nameLocalization.length && !descriptionLocalization.length)
       return undefined;
 
-    const name_idx = name.findIndex((v) =>
-      is_chat_input
-        ? v.split(' ')[name_arg_idx ?? 0] == name_arg_text
-        : v == name_arg_text,
+    const nameIdx = name.findIndex((v) =>
+      isChatInput
+        ? v.split(' ')[nameArgIdx ?? 0] == nameArgText
+        : v == nameArgText,
     );
-    if (name_idx < 0) return undefined;
+    if (nameIdx < 0) return undefined;
 
-    if (is_chat_input) {
-      if (name.length != name_localization.length)
+    if (isChatInput) {
+      if (name.length != nameLocalization.length)
         throw new Error(
           [
             'The number of command names and command localizations does not match.',
@@ -379,12 +379,12 @@ export class ExtendedApplicationCommand<
           ].join('\n'),
         );
 
-      if (name_localization.length > 1 && description_localization.length == 1)
-        description_localization = Array(name_localization.length).fill(
-          description_localization[0],
+      if (nameLocalization.length > 1 && descriptionLocalization.length == 1)
+        descriptionLocalization = Array(nameLocalization.length).fill(
+          descriptionLocalization[0],
         );
 
-      if (name_localization.length != description_localization.length)
+      if (nameLocalization.length != descriptionLocalization.length)
         throw new Error(
           [
             'The number of command name localizations and command description localizations does not match.',
@@ -397,17 +397,17 @@ export class ExtendedApplicationCommand<
       ApplicationCommandJSON,
       'name_localizations' | 'description_localizations'
     > = {};
-    for (const locale of Object.keys(name_localization[name_idx])) {
+    for (const locale of Object.keys(nameLocalization[nameIdx])) {
       result.name_localizations = {
         ...result.name_localizations,
-        [locale]: is_chat_input
-          ? name_localization[name_idx][locale].split(' ')[name_arg_idx]
-          : name_localization[name_idx][locale],
+        [locale]: isChatInput
+          ? nameLocalization[nameIdx][locale].split(' ')[nameArgIdx]
+          : nameLocalization[nameIdx][locale],
       };
-      if (is_chat_input)
+      if (isChatInput)
         result.description_localizations = {
           ...result.description_localizations,
-          [locale]: description_localization[name_idx][locale],
+          [locale]: descriptionLocalization[nameIdx][locale],
         };
     }
     return result;
@@ -419,19 +419,19 @@ export class ExtendedApplicationCommand<
   >(
     type: Type,
     command: ExtendedApplicationCommnadType<Type, boolean>,
-    name_arg_text: string,
-    name_arg_idx?: IsChatInput<Type, NameArgIdx>,
+    nameArgText: string,
+    nameArgIdx?: IsChatInput<Type, NameArgIdx>,
   ): Type extends ApplicationCommandType.ChatInput
     ? NameArgIdx extends 0
       ? RESTPostAPIChatInputApplicationCommandsJSONBody
       : APIApplicationCommandSubcommandOption
     : RESTPostAPIContextMenuApplicationCommandsJSONBody {
-    const is_chat_input = type == ApplicationCommandType.ChatInput;
+    const isChatInput = type == ApplicationCommandType.ChatInput;
 
     const name = toArray(command.name);
     let description = toArray(command.description ?? []);
 
-    if (is_chat_input) {
+    if (isChatInput) {
       if (name.length > 1 && description.length == 1)
         description = Array(name.length).fill(description[0]);
 
@@ -444,17 +444,17 @@ export class ExtendedApplicationCommand<
         );
     }
 
-    const name_idx = name.findIndex((v) =>
-      is_chat_input
-        ? v.split(' ')[name_arg_idx ?? 0] == name_arg_text
-        : v == name_arg_text,
+    const nameIdx = name.findIndex((v) =>
+      isChatInput
+        ? v.split(' ')[nameArgIdx ?? 0] == nameArgText
+        : v == nameArgText,
     );
-    if (name_idx < 0)
+    if (nameIdx < 0)
       throw new Error(
         [
           'Command Name is not valid.',
           `Command Name : '${name.join(`', `)}'`,
-          `Search Name : '${is_chat_input ? '* ' : ''}${name_arg_text}'`,
+          `Search Name : '${isChatInput ? '* ' : ''}${nameArgText}'`,
         ].join('\n'),
       );
 
@@ -470,19 +470,19 @@ export class ExtendedApplicationCommand<
     const localization = this.getCommandLocalization(
       type,
       command,
-      name_arg_text,
-      name_arg_idx,
+      nameArgText,
+      nameArgIdx,
     );
 
     return {
       options: [],
       ...builder,
       ...localization,
-      type: name_arg_idx == 0 ? type : ApplicationCommandOptionType.Subcommand,
-      name: is_chat_input
-        ? name[name_idx].split(' ')[name_arg_idx ?? 0]
-        : name[name_idx],
-      description: is_chat_input ? description[name_idx] : undefined,
+      type: nameArgIdx == 0 ? type : ApplicationCommandOptionType.Subcommand,
+      name: isChatInput
+        ? name[nameIdx].split(' ')[nameArgIdx ?? 0]
+        : name[nameIdx],
+      description: isChatInput ? description[nameIdx] : undefined,
     } as Type extends ApplicationCommandType.ChatInput
       ? NameArgIdx extends 0
         ? RESTPostAPIChatInputApplicationCommandsJSONBody
@@ -495,70 +495,69 @@ export class ExtendedApplicationCommand<
       AllowApplicationCommandType,
       boolean
     >,
-    name_arg_text: string,
-    name_arg_idx: NameArgIdx,
+    nameArgText: string,
+    nameArgIdx: NameArgIdx,
   ): NameArgIdx extends 0
     ? RESTPostAPIContextMenuApplicationCommandsJSONBody
     : APIApplicationCommandSubcommandGroupOption {
-    const name_idx = toArray(command.name).findIndex(
-      (v) => v.split(' ')[name_arg_idx] == name_arg_text,
+    const nameIdx = toArray(command.name).findIndex(
+      (v) => v.split(' ')[nameArgIdx] == nameArgText,
     );
-    if (name_idx < 0)
+    if (nameIdx < 0)
       throw new Error(
         [
           'Command Name is not valid.',
           `Command Name : '${toArray(command.name).join(`', `)}'`,
-          `Search Name : '${name_arg_idx == 0 ? '* ' : ''}${name_arg_text}'`,
+          `Search Name : '${nameArgIdx == 0 ? '* ' : ''}${nameArgText}'`,
         ].join('\n'),
       );
 
-    const name = toArray(command.name)[name_idx];
-    const name_arg = name.split(' ');
+    const name = toArray(command.name)[nameIdx];
+    const nameArg = name.split(' ');
 
-    const parent_description_arg = (locale: Locale) =>
+    const parentDescriptionArg = (locale: Locale) =>
       toArray(
-        command.parent_description?.[
-          name_arg_idx == 0 ? 'subcommand' : 'subcommand_group'
+        command.parentDescription?.[
+          nameArgIdx == 0 ? 'subcommand' : 'subcommandGroup'
         ] ?? [],
-      )?.[name_idx]?.[locale];
+      )?.[nameIdx]?.[locale];
 
-    const name_localization_arg = (locale: Locale) =>
-      toArray(command.localization?.name ?? [])?.[name_idx]?.[locale]?.split(
+    const nameLocalizationArg = (locale: Locale) =>
+      toArray(command.localization?.name ?? [])?.[nameIdx]?.[locale]?.split(
         ' ',
       );
 
-    const description_localizations: LocalizationMap =
-      Language.locales().reduce(
-        (cur, acc) => ({
-          ...cur,
-          [acc]:
-            parent_description_arg(acc) ??
-            Language.get(
-              acc,
-              name_arg_idx == 0
-                ? 'Subcommand_Description'
-                : 'SubcommandGroup_Description',
-              name_localization_arg(acc)?.[0] ?? name_arg[0],
-              name_localization_arg(acc)?.[1] ?? name_arg[1],
-            ),
-        }),
-        {},
-      );
+    const descriptionLocalizations: LocalizationMap = Language.locales().reduce(
+      (cur, acc) => ({
+        ...cur,
+        [acc]:
+          parentDescriptionArg(acc) ??
+          Language.get(
+            acc,
+            nameArgIdx == 0
+              ? 'Subcommand_Description'
+              : 'SubcommandGroup_Description',
+            nameLocalizationArg(acc)?.[0] ?? nameArg[0],
+            nameLocalizationArg(acc)?.[1] ?? nameArg[1],
+          ),
+      }),
+      {},
+    );
 
     return {
       type:
-        name_arg_idx == 0
+        nameArgIdx == 0
           ? ApplicationCommandType.ChatInput
           : ApplicationCommandOptionType.SubcommandGroup,
       ...this.getCommandLocalization(
         command.type,
         command,
-        name_arg[name_arg_idx],
-        name_arg_idx,
+        nameArg[nameArgIdx],
+        nameArgIdx,
       ),
-      name: name_arg[name_arg_idx],
-      description: description_localizations[BotConfig.DEFAULT_LANGUAGE],
-      description_localizations,
+      name: nameArg[nameArgIdx],
+      description: descriptionLocalizations[BotConfig.DEFAULT_LANGUAGE],
+      description_localizations: descriptionLocalizations,
       options: [],
     } as unknown as NameArgIdx extends 0
       ? RESTPostAPIContextMenuApplicationCommandsJSONBody
@@ -571,59 +570,59 @@ export class ExtendedApplicationCommand<
     const result: ApplicationCommandsJSONBody[] = [];
 
     for (const command of commands.values()) {
-      const names_sorted = toArray(command.name).sort(
+      const namesSorted = toArray(command.name).sort(
         (a, b) => b.split(' ').length - a.split(' ').length,
       );
-      for (const name of names_sorted) {
-        const name_arg = name.split(' ');
+      for (const name of namesSorted) {
+        const nameArg = name.split(' ');
 
-        const single_command = this.convertSingleCommand(
+        const singleCommand = this.convertSingleCommand(
           command.type,
           command,
-          name_arg[name_arg.length - 1],
+          nameArg[nameArg.length - 1],
           command.type == ApplicationCommandType.ChatInput
-            ? ((name_arg.length - 1) as 0 | 1 | 2)
+            ? ((nameArg.length - 1) as 0 | 1 | 2)
             : undefined,
         );
 
         if (command.type != ApplicationCommandType.ChatInput)
           result.push(
-            single_command as RESTPostAPIContextMenuApplicationCommandsJSONBody,
+            singleCommand as RESTPostAPIContextMenuApplicationCommandsJSONBody,
           );
         else {
-          if (name_arg.length > 1 && !result.find((v) => v.name == name_arg[0]))
-            result.push(this.convertCommandParent(command, name_arg[0], 0));
+          if (nameArg.length > 1 && !result.find((v) => v.name == nameArg[0]))
+            result.push(this.convertCommandParent(command, nameArg[0], 0));
 
           if (
-            name_arg.length > 2 &&
+            nameArg.length > 2 &&
             !result.find(
               (v) =>
-                v.name == name_arg[0] &&
-                v.options?.find((v) => v.name == name_arg[1]),
+                v.name == nameArg[0] &&
+                v.options?.find((v) => v.name == nameArg[1]),
             )
           )
             result
-              .find((v) => v.name == name_arg[0])
+              .find((v) => v.name == nameArg[0])
               ?.options?.push(
-                this.convertCommandParent(command, name_arg[1], 1),
+                this.convertCommandParent(command, nameArg[1], 1),
               );
 
-          if (name_arg.length == 1)
+          if (nameArg.length == 1)
             result.push(
-              single_command as RESTPostAPIChatInputApplicationCommandsJSONBody,
+              singleCommand as RESTPostAPIChatInputApplicationCommandsJSONBody,
             );
-          else if (name_arg.length == 2)
+          else if (nameArg.length == 2)
             result
-              .find((v) => v.name == name_arg[0])
+              .find((v) => v.name == nameArg[0])
               ?.options?.push(
-                single_command as APIApplicationCommandSubcommandOption,
+                singleCommand as APIApplicationCommandSubcommandOption,
               );
           else {
             const group = result
-              .find((v) => v.name == name_arg[0])
-              ?.options?.find((v) => v.name == name_arg[1]);
+              .find((v) => v.name == nameArg[0])
+              ?.options?.find((v) => v.name == nameArg[1]);
             if (group && 'options' in group)
-              group.options?.push(single_command as any);
+              group.options?.push(singleCommand as any);
           }
         }
       }
@@ -634,11 +633,11 @@ export class ExtendedApplicationCommand<
 
   static async logCommand() {
     for (const [key, command] of this.commands) {
-      const names_sorted = toArray(command.name).sort(
+      const namesSorted = toArray(command.name).sort(
         (a, b) => b.split(' ').length - a.split(' ').length,
       );
-      for (const name of names_sorted) {
-        const guild_id = toArray(key.guild_id ?? []);
+      for (const name of namesSorted) {
+        const guildId = toArray(key.guildId ?? []);
         Log.debug(
           [
             `Added ${chalk.green(name)} ${
@@ -646,11 +645,11 @@ export class ExtendedApplicationCommand<
                 ? 'Chat Input'
                 : 'Context Menu'
             } for ${
-              guild_id.length ? chalk.cyan('Guild') : chalk.red('Global')
-            } (Key : ${chalk.green(key.function_name)}, Guild : ${
-              !guild_id.length
+              guildId.length ? chalk.cyan('Guild') : chalk.red('Global')
+            } (Key : ${chalk.green(key.functionName)}, Guild : ${
+              !guildId.length
                 ? chalk.red('None')
-                : guild_id.map((v) => chalk.cyan(v)).join(', ')
+                : guildId.map((v) => chalk.cyan(v)).join(', ')
             })`,
             `Location : ${chalk.yellow(key.path)}`,
           ].join('\n'),
@@ -662,11 +661,11 @@ export class ExtendedApplicationCommand<
   static async registerCommand() {
     if (!process.env.BOT_TOKEN) throw new Error('BOT_TOKEN is missing');
     const rest = new REST().setToken(process.env.BOT_TOKEN);
-    const command_filtered = new Map(
-      [...this.commands].filter(([k]) => !k.guild_id),
+    const commandFiltered = new Map(
+      [...this.commands].filter(([k]) => !k.guildId),
     );
-    const command = this.convertCommand(command_filtered);
-    await rest.put(Routes.applicationCommands(DiscordUtil.client_id), {
+    const command = this.convertCommand(commandFiltered);
+    await rest.put(Routes.applicationCommands(DiscordUtil.clientId), {
       body: command,
     });
   }
@@ -674,18 +673,18 @@ export class ExtendedApplicationCommand<
   static async registerGuildCommand() {
     if (!process.env.BOT_TOKEN) throw new Error('BOT_TOKEN is missing');
     const rest = new REST().setToken(process.env.BOT_TOKEN);
-    const command_filtered = new Map(
-      [...this.commands].filter(([k]) => k.guild_id),
+    const commandFiltered = new Map(
+      [...this.commands].filter(([k]) => k.guildId),
     );
-    const guild_command: Map<string, ExtendedApplicationCommnadMap> = new Map();
-    for (const [k, v] of command_filtered)
-      for (const id of k.guild_id ?? []) {
-        if (!guild_command.has(id)) guild_command.set(id, new Map());
-        guild_command.get(id)?.set(k, v);
+    const guildCommand: Map<string, ExtendedApplicationCommnadMap> = new Map();
+    for (const [k, v] of commandFiltered)
+      for (const id of k.guildId ?? []) {
+        if (!guildCommand.has(id)) guildCommand.set(id, new Map());
+        guildCommand.get(id)?.set(k, v);
       }
-    for (const [guild_id, command] of guild_command)
+    for (const [guildId, command] of guildCommand)
       await rest.put(
-        Routes.applicationGuildCommands(DiscordUtil.client_id, guild_id),
+        Routes.applicationGuildCommands(DiscordUtil.clientId, guildId),
         {
           body: this.convertCommand(command),
         },

@@ -7,7 +7,7 @@ export class Koreanbots {
     try {
       if (!process.env.KOREANBOTS_TOKEN) return;
       const result = await fetch(
-        `https://koreanbots.dev/api/v2/bots/${DiscordUtil.client_id}/stats`,
+        `https://koreanbots.dev/api/v2/bots/${DiscordUtil.clientId}/stats`,
         {
           method: 'POST',
           headers: {

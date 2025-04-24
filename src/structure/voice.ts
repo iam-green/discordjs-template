@@ -17,11 +17,11 @@ import { ExtendedClient } from './client';
 export interface VoiceOption {
   volume: number;
   repeat: boolean;
-  auto_left: boolean;
+  autoLeft: boolean;
 }
 
 export interface VoiceInfo {
-  channel_id: string;
+  channelId: string;
   voice: VoiceConnection;
   queue: VoiceQueueInfo[];
   resource?: AudioResource;
@@ -29,8 +29,8 @@ export interface VoiceInfo {
   option?: Partial<VoiceOption>;
   status: {
     adding: boolean;
-    voice_attempt: number;
-    voice_restarting: boolean;
+    voiceAttempt: number;
+    voiceRestarting: boolean;
   };
 }
 
@@ -44,37 +44,37 @@ export interface VoiceQueueInfo {
 export class Voice {
   public static list = new Map<string, VoiceInfo>();
 
-  static checkJoined(guild_id: string) {
-    return this.list.has(guild_id);
+  static checkJoined(guildId: string) {
+    return this.list.has(guildId);
   }
 
   static async join(
     client: ExtendedClient,
-    guild_id: string,
-    channel_id: string,
+    guildId: string,
+    channelId: string,
     option?: Partial<VoiceOption>,
   ) {
-    const guild = client.guilds.cache.get(guild_id);
+    const guild = client.guilds.cache.get(guildId);
     if (!guild) return;
-    this.list.set(guild_id, {
-      channel_id,
+    this.list.set(guildId, {
+      channelId,
       voice: joinVoiceChannel({
-        channelId: channel_id,
-        guildId: guild_id,
+        channelId,
+        guildId,
         adapterCreator: guild.voiceAdapterCreator,
       }),
       queue: [],
       option,
       status: {
         adding: false,
-        voice_attempt: 1,
-        voice_restarting: false,
+        voiceAttempt: 1,
+        voiceRestarting: false,
       },
     });
   }
 
-  static async subscribe(guild_id: string, option: VoiceQueueInfo) {
-    const voice = this.list.get(guild_id);
+  static async subscribe(guildId: string, option: VoiceQueueInfo) {
+    const voice = this.list.get(guildId);
     if (!voice) return;
     voice.resource = createAudioResource(await voice.queue[0].voice(), {
       inlineVolume: true,
@@ -87,8 +87,8 @@ export class Voice {
     if (voice.player) voice.voice.subscribe(voice.player);
   }
 
-  static async play(guild_id: string, option: VoiceQueueInfo) {
-    const voice = this.list.get(guild_id);
+  static async play(guildId: string, option: VoiceQueueInfo) {
+    const voice = this.list.get(guildId);
     if (!voice) return;
 
     voice.queue.push(option);
@@ -106,31 +106,31 @@ export class Voice {
         newState.reason == VoiceConnectionDisconnectReason.WebSocketClose &&
         ![4006, 4014].includes(newState.closeCode)
       )
-        this.quit(guild_id);
+        this.quit(guildId);
     });
 
     // Voice Connection Error Handling
     voice.voice.on('error', async () => {
       if (voice.voice.state.status != VoiceConnectionStatus.Destroyed)
-        this.quit(guild_id);
+        this.quit(guildId);
     });
 
     // Voice Player Error Handling
     voice.player?.on('error', async (e) => {
-      if (voice.status.voice_restarting) return;
-      voice.status.voice_restarting = true;
+      if (voice.status.voiceRestarting) return;
+      voice.status.voiceRestarting = true;
       Log.warn(
-        `AudioPlayer error occurred, attempt: ${++voice.status.voice_attempt}`,
+        `AudioPlayer error occurred, attempt: ${++voice.status.voiceAttempt}`,
       );
-      if (voice.status.voice_attempt > 3) throw e;
-      voice.status.voice_restarting = false;
-      return await this.subscribe(guild_id, option);
+      if (voice.status.voiceAttempt > 3) throw e;
+      voice.status.voiceRestarting = false;
+      return await this.subscribe(guildId, option);
     });
 
     // Voice Player Idle Handling
     voice.player?.on(AudioPlayerStatus.Idle, async () => {
-      if (voice.status.voice_restarting) return;
-      voice.status.voice_attempt = 1;
+      if (voice.status.voiceRestarting) return;
+      voice.status.voiceAttempt = 1;
       if (voice.status.adding) return;
       voice.status.adding = true;
       await new Promise((resolve) => setTimeout(resolve, 0));
@@ -139,13 +139,13 @@ export class Voice {
       voice.queue.sort(
         (a, b) => +(a.date ?? new Date(0)) - +(b.date ?? new Date(0)),
       );
-      if (voice.queue.length > 0) await this.subscribe(guild_id, option);
+      if (voice.queue.length > 0) await this.subscribe(guildId, option);
       voice.status.adding = false;
     });
   }
 
-  static skip(guild_id: string, count: number = 1) {
-    const voice = this.list.get(guild_id);
+  static skip(guildId: string, count: number = 1) {
+    const voice = this.list.get(guildId);
     if (!voice) return;
     const queue = voice.queue.splice(
       0,
@@ -155,8 +155,8 @@ export class Voice {
     voice.player?.stop();
   }
 
-  static shuffle(guild_id: string) {
-    const voice = this.list.get(guild_id);
+  static shuffle(guildId: string) {
+    const voice = this.list.get(guildId);
     if (!voice) return;
     voice.queue = [
       voice.queue[0],
@@ -164,35 +164,35 @@ export class Voice {
     ];
   }
 
-  static repeat(guild_id: string, status: boolean) {
-    const voice = this.list.get(guild_id);
+  static repeat(guildId: string, status: boolean) {
+    const voice = this.list.get(guildId);
     if (!voice) return;
     if (!voice.option) voice.option = {};
     voice.option.repeat = status;
   }
 
-  static volume(guild_id: string, volume: number) {
+  static volume(guildId: string, volume: number) {
     volume = volume > 2 ? 2 : volume < 0 ? 0 : volume;
-    const voice = this.list.get(guild_id);
+    const voice = this.list.get(guildId);
     if (!voice) return;
     if (!voice.option) voice.option = {};
     voice.option.volume = volume;
     voice.resource?.volume?.setVolume((voice.queue[0].volume ?? 1) * volume);
   }
 
-  static stop(guild_id: string) {
-    const voice = this.list.get(guild_id);
+  static stop(guildId: string) {
+    const voice = this.list.get(guildId);
     if (!voice) return;
     voice.queue = [];
     voice.player?.stop();
   }
 
-  static quit(guild_id: string) {
-    const voice = this.list.get(guild_id);
+  static quit(guildId: string) {
+    const voice = this.list.get(guildId);
     if (!voice) return;
     voice.queue = [];
     voice.player?.stop();
     voice.voice.destroy();
-    this.list.delete(guild_id);
+    this.list.delete(guildId);
   }
 }
