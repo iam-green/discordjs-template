@@ -277,14 +277,15 @@ export class ExtendedClient extends Client {
             | Interaction
             | Message
             | null;
-          if (!data) return;
 
-          const validate = this.checkOptions({
-            interaction: data,
-            command_name: event.event,
-            options: event.options,
-          });
-          if (!validate.status) return;
+          if (data) {
+            const validate = this.checkOptions({
+              interaction: data,
+              command_name: event.event,
+              options: event.options,
+            });
+            if (!validate.status) return;
+          }
         }
 
         Promise.resolve()
