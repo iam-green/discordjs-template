@@ -9,6 +9,9 @@ import {
 import { DiscordUtil } from './common';
 
 async function bootstrap() {
+  // Open Health Check Server
+  if (process.env.HEALTH_CHECK) await import('./health');
+
   // Initialize Discord Data
   await DiscordUtil.refresh();
 

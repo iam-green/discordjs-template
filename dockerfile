@@ -22,3 +22,5 @@ ENV NODE_ENV=production
 COPY --from=builder /app ./
 COPY --from=builder /app/node_modules ./node_modules
 CMD ["pnpm", "start"]
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD curl --fail http://localhost:8000/health || exit 1
