@@ -27,6 +27,8 @@ export const BotConfig = {
     'text_commands',
     'textcommand',
     'textcommands',
+    'textCommand',
+    'textCommands',
   ],
   EVENT_FOLDERS: ['event', 'events'],
 };
