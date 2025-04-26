@@ -6,7 +6,8 @@ import {
   ExtendedTextCommand,
   Language,
 } from './structure';
-import { DiscordUtil } from './common';
+import { DiscordUtil, Log } from './common';
+import chalk from 'chalk';
 
 async function bootstrap() {
   // Open Health Check Server
@@ -24,8 +25,11 @@ async function bootstrap() {
   await ExtendedApplicationCommand.init();
 
   // Register Application Commands
-  await ExtendedApplicationCommand.registerCommand();
-  await ExtendedApplicationCommand.registerGuildCommand();
+  if (!process.env.WITHOUT_REGISTER) {
+    Log.info(chalk`Registering {green Application Commands}...`);
+    await ExtendedApplicationCommand.registerCommand();
+    await ExtendedApplicationCommand.registerGuildCommand();
+  }
 
   // Log Loaded Commands & Events & Menus
   await ExtendedEvent.logEvents();

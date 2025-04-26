@@ -4,5 +4,8 @@
   "ext": "ts,js,json",
   "ignore": ["node_modules", "dist"],
   "exec": "npm run dev",
-  "env": { "NODE_ENV": "development" }
+  "env": {
+    "NODE_ENV": "development",
+    "WITHOUT_REGISTER": "true"
+  }
 }
