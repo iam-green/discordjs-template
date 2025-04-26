@@ -304,7 +304,7 @@ ExtendedComponent.init = async (
   for (const path of components) {
     const content = await import(path);
     for (const key of Object.keys(content)) {
-      if (typeof content[key] == 'function') continue;
+      if (!content[key].data) continue;
       if (
         process.env.NODE_ENV == 'production' &&
         content[key]?.component_data?.options?.onlyDevelopment
