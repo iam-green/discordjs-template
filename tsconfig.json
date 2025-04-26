@@ -15,7 +15,9 @@
     "strictPropertyInitialization": false,
     "strictNullChecks": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "checkJs": true
   },
   "include": ["src", "src/**/*.json"],
   "exclude": ["node_modules", "**/*.spec.ts"]
