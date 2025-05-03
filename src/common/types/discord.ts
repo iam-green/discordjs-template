@@ -1,4 +1,8 @@
-import { BaseInteraction } from 'discord.js';
+import {
+  BaseInteraction,
+  BaseMessageOptions,
+  InteractionReplyOptions,
+} from 'discord.js';
 
 export type GuildInteraction<
   T extends BaseInteraction,
@@ -12,3 +16,9 @@ export type GuildInteraction<
       memberPermissions: NonNullable<T['memberPermissions']>;
     }
   : T;
+
+export type MessageOptionType = 'message' | 'interaction';
+
+export type MessageOption<T extends MessageOptionType> = T extends 'message'
+  ? BaseMessageOptions
+  : InteractionReplyOptions;
