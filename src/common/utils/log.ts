@@ -52,7 +52,7 @@ export class Log {
         typeof v == 'string' ? v.replace(/\n/g, '\n\t') : v,
       ),
     ];
-    if (process.env.NODE_ENV == 'development') console.log(...result);
+    if (process.env.NODE_ENV == 'development') console.debug(...result);
     if (process.env.SAVE_LOGS == 'true') Log.write('debug', ...result);
   }
 
