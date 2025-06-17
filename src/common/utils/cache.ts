@@ -43,16 +43,24 @@ export class Cache {
   static async invalidateTag(tag: string) {
     const tagKey = this.getTagKey(tag);
     const keys = await this._get<string[]>(tagKey);
-    for (const cacheKey of keys ?? []) {
-      await this._del(cacheKey);
-      await this._del(this.getMetaKey(cacheKey));
-    }
+    if (keys?.length)
+      await Promise.all(
+        keys.map(async (cacheKey) => {
+          await this._del(cacheKey);
+          await this._del(this.getMetaKey(cacheKey));
+        }),
+      );
     await this._del(tagKey);
   }
 
   private static async cascadeInvalidateByKey(key: string) {
     const metaTags = await this._get<string[]>(this.getMetaKey(key));
-    for (const tag of metaTags ?? []) await this.invalidateTag(tag);
+    if (metaTags?.length)
+      await Promise.all(
+        metaTags.map(async (tag) => {
+          await this.invalidateTag(tag);
+        }),
+      );
   }
 
   static async get<T>(key: string) {
@@ -64,12 +72,15 @@ export class Cache {
     if (beforeData) await this.cascadeInvalidateByKey(key);
     await this._set(key, value, ttl);
     await this._set(this.getMetaKey(key), tags ?? []);
-    for (const tag of tags ?? []) {
-      const tagKey = this.getTagKey(tag);
-      const tagKeys = (await this._get<string[]>(tagKey)) ?? [];
-      if (!tagKeys.includes(key)) tagKeys.push(key);
-      await this._set(tagKey, tagKeys, 0);
-    }
+    if (tags?.length)
+      await Promise.all(
+        tags.map(async (tag) => {
+          const tagKey = this.getTagKey(tag);
+          const tagKeys = (await this._get<string[]>(tagKey)) ?? [];
+          if (!tagKeys.includes(key)) tagKeys.push(key);
+          await this._set(tagKey, tagKeys, 0);
+        }),
+      );
   }
 
   static async remove(key: string) {
