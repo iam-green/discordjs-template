@@ -269,7 +269,7 @@ export type ExtendedApplicationCommnadType<
    * * Write the code to execute the command.
    * @param options You can retrieve client data, interaction data, and command arguments.
    */
-  run: (options: ApplicationCommmandRunOptions<Type, InGuild>) => Promise<any>;
+  run: (options: ApplicationCommmandRunOptions<Type, InGuild>) => Promise<void>;
 
   /**
    * Code to execute the autocomplete
@@ -278,7 +278,7 @@ export type ExtendedApplicationCommnadType<
    */
   autocomplete?: IsChatInput<
     Type,
-    (options: AutocompleteOptions<InGuild>) => Promise<any>
+    (options: AutocompleteOptions<InGuild>) => Promise<void>
   >;
 };
 
