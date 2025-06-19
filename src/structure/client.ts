@@ -271,27 +271,11 @@ export class ExtendedClient extends Client {
 
   private async addEvents() {
     for (const event of ExtendedEvent.events.values())
-      this[event.once ? 'once' : 'on'](event.event, (...args) => {
-        if (event.options) {
-          const data = args.find((v) => 'reply' in v) as
-            | Interaction
-            | Message
-            | null;
-
-          if (data) {
-            const validate = this.checkOptions({
-              interaction: data,
-              commandName: event.event,
-              options: event.options,
-            });
-            if (!validate.status) return;
-          }
-        }
-
+      this[event.once ? 'once' : 'on'](event.event, (...args) =>
         Promise.resolve()
           .then(() => event.run(this, ...args))
-          .catch(this.error);
-      });
+          .catch(this.error),
+      );
   }
 
   private checkOptions<T extends Interaction | Message>({

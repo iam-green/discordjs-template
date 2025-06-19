@@ -25,64 +25,10 @@ export type ExtendedEventType<
    */
   options?: Partial<{
     /**
-     * Whether the event is only available in guilds
-     * * If you enable this option, you can import guild-related information.
-     * @default false
-     */
-    onlyGuild: InGuild;
-
-    /**
      * Whether the event is only available in development
      * @default false
      */
     onlyDevelopment: boolean;
-
-    /**
-     * Set specific guilds to use the event
-     * * Configures the event to be usable only in the specified guilds.
-     */
-    guildId: ValueOrArray<string>;
-
-    /**
-     * Event Permissions
-     * * Sets the permissions required to use the event.
-     */
-    permission: Partial<{
-      /**
-       * User Permissions
-       * * Permissions required for users to use the event.
-       * * If default_permission is enabled, the first value will be registered
-       *   as the default permission for the slash event.
-       */
-      user: ValueOrArray<PermissionResolvable>;
-
-      /**
-       * Bot Permissions
-       * Permissions required for the bot to execute the event.
-       */
-      bot: ValueOrArray<PermissionResolvable>;
-    }>;
-
-    /**
-     * Event for Bot Administrators Only
-     * * Sets the event to be available only to bot administrators.
-     * @default false
-     */
-    botAdmin: boolean;
-
-    /**
-     * Event for Bot Developers Only
-     * * Sets the event to be available only to bot developers.
-     * @default false
-     */
-    botDeveloper: boolean;
-
-    /**
-     * Event for Guild Owners Only
-     * * Sets the event to be available only to guild owners.
-     * @default false
-     */
-    guildOwner: boolean;
   }>;
 
   /**
