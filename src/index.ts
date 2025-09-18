@@ -25,7 +25,7 @@ async function bootstrap() {
   await ExtendedApplicationCommand.init();
 
   // Register Application Commands
-  if (!process.env.WITHOUT_REGISTER) {
+  if (process.env.WITHOUT_REGISTER != 'true') {
     Log.info(chalk`Registering {green Application Commands}...`);
     await ExtendedApplicationCommand.registerCommand();
     await ExtendedApplicationCommand.registerGuildCommand();
