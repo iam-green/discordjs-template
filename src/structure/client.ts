@@ -23,7 +23,7 @@ import { ExtendedComponent } from './component';
 import { ExtendedTextCommand } from './textCommand';
 import { ExtendedApplicationCommand } from './applicationCommand';
 import { DiscordUtil, Log, toArray, ValueOrArray } from '@/common';
-import { BotConfig, EmbedConfig } from '@/config';
+import { BotConfig, MessageConfig } from '@/config';
 
 export class ExtendedClient extends Client {
   cluster = new ClusterClient(this);
@@ -341,7 +341,7 @@ export class ExtendedClient extends Client {
                   'Embed_Warn_OnlyCanUseInGuild_Description',
                 ),
               )
-              .setColor(EmbedConfig.WARN_COLOR)
+              .setColor(MessageConfig.WARN_COLOR)
               .setFooter({
                 text: user.tag,
                 iconURL: user.avatarURL() ?? undefined,
@@ -378,7 +378,7 @@ export class ExtendedClient extends Client {
                     (cooldown / 1000) | 0,
                   ),
                 )
-                .setColor(EmbedConfig.WARN_COLOR)
+                .setColor(MessageConfig.WARN_COLOR)
                 .setFooter({
                   text: user.tag,
                   iconURL: user.avatarURL() ?? undefined,
@@ -427,7 +427,7 @@ export class ExtendedClient extends Client {
                     ) +
                     '`',
                 )
-                .setColor(EmbedConfig.WARN_COLOR)
+                .setColor(MessageConfig.WARN_COLOR)
                 .setFooter({
                   text: user.tag,
                   iconURL: user.avatarURL() ?? undefined,
@@ -463,7 +463,7 @@ export class ExtendedClient extends Client {
                   'Embed_Warn_OnlyBotAdminCanUse_Description',
                 ),
               )
-              .setColor(EmbedConfig.WARN_COLOR)
+              .setColor(MessageConfig.WARN_COLOR)
               .setFooter({
                 text: user.tag,
                 iconURL: user.avatarURL() ?? undefined,
@@ -492,7 +492,7 @@ export class ExtendedClient extends Client {
                   'Embed_Warn_OnlyGuildOwnerCanUse_Description',
                 ),
               )
-              .setColor(EmbedConfig.WARN_COLOR)
+              .setColor(MessageConfig.WARN_COLOR)
               .setFooter({
                 text: user.tag,
                 iconURL: user.avatarURL() ?? undefined,
