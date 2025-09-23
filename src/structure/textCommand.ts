@@ -121,8 +121,10 @@ export class ExtendedTextCommand<InGuild extends boolean> {
    * @param folders Folders to search for text commands
    */
   static async init(folders: string[] = BotConfig.TEXT_COMMAND_FOLDERS) {
+    const globFolders =
+      folders.length < 2 ? folders[0] : `{${folders.join(',')}}`;
     const commands = await glob(
-      `${sep(__dirname)}/../{${folders.join(',')}}/**/*.{ts,js}`,
+      `${sep(__dirname)}/../${globFolders}/**/*.{ts,js}`,
     );
     for (const path of commands) {
       const content = await import(path);

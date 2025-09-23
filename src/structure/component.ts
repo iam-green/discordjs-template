@@ -298,9 +298,11 @@ ExtendedComponent.removeExpired = () => {
 ExtendedComponent.init = async (
   folders: string[] = BotConfig.COMPONENT_FOLDERS,
 ) => {
-  const components = await glob(
-    `${sep(__dirname)}/../{${folders.join(',')}}/**/*.{ts,js}`,
-  );
+    const globFolders =
+      folders.length < 2 ? folders[0] : `{${folders.join(',')}}`;
+    const components = await glob(
+      `${sep(__dirname)}/../${globFolders}/**/*.{ts,js}`,
+    );
   for (const path of components) {
     const content = await import(path);
     for (const key of Object.keys(content)) {

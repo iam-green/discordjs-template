@@ -1,14 +1,11 @@
-import { ClientEvents, PermissionResolvable } from 'discord.js';
+import { ClientEvents } from 'discord.js';
 import { ExtendedClient } from './client';
 import { glob } from 'glob';
-import { Log, sep, ValueOrArray } from '@/common';
+import { Log, sep } from '@/common';
 import chalk from 'chalk';
 import { BotConfig } from '@/config';
 
-export type ExtendedEventType<
-  Key extends keyof ClientEvents,
-  InGuild extends boolean,
-> = {
+export type ExtendedEventType<Key extends keyof ClientEvents> = {
   /**
    * Discord Event Type
    */
@@ -47,24 +44,23 @@ export type ExtendedEventMapKey = {
 
 export type ExtendedEventMap = Map<
   ExtendedEventMapKey,
-  ExtendedEventType<keyof ClientEvents, boolean>
+  ExtendedEventType<keyof ClientEvents>
 >;
 
-export class ExtendedEvent<
-  Key extends keyof ClientEvents,
-  InGuild extends boolean,
-> {
+export class ExtendedEvent<Key extends keyof ClientEvents> {
   public static events: ExtendedEventMap = new Map();
 
-  constructor(public readonly data: ExtendedEventType<Key, InGuild>) {}
+  constructor(public readonly data: ExtendedEventType<Key>) {}
 
   /**
    * Initialize the event
    * @param folders Folders to search for events
    */
   static async init(folders: string[] = BotConfig.EVENT_FOLDERS) {
+    const globFolders =
+      folders.length < 2 ? folders[0] : `{${folders.join(',')}}`;
     const events = await glob(
-      `${sep(__dirname)}/../{${folders.join(',')}}/**/*{.ts,.js}`,
+      `${sep(__dirname)}/../${globFolders}/**/*.{ts,js}`,
     );
     for (const path of events) {
       const content = await import(path);
