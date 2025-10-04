@@ -26,6 +26,8 @@ import {
   Routes,
   Locale,
   CommandInteractionOptionResolver,
+  SlashCommandBuilder,
+  PermissionFlagsBits,
 } from 'discord.js';
 import { ExtendedClient } from './client';
 import { glob } from 'glob';
@@ -592,8 +594,26 @@ export class ExtendedApplicationCommand<
             singleCommand as RESTPostAPIContextMenuApplicationCommandsJSONBody,
           );
         else {
+          const defaultMemberPermission = command?.options?.permission
+            ?.defaultPermission
+            ? {
+                default_member_permissions: new SlashCommandBuilder()
+                  .setName('test')
+                  .setDescription('test')
+                  .setDefaultMemberPermissions(
+                    (toArray(
+                      command?.options?.permission?.user,
+                    )[0] as bigint) ?? PermissionFlagsBits.Administrator,
+                  )
+                  .toJSON().default_member_permissions,
+              }
+            : {};
+
           if (nameArg.length > 1 && !result.find((v) => v.name == nameArg[0]))
-            result.push(this.convertCommandParent(command, nameArg[0], 0));
+            result.push({
+              ...this.convertCommandParent(command, nameArg[0], 0),
+              ...defaultMemberPermission,
+            });
 
           if (
             nameArg.length > 2 &&
@@ -610,9 +630,10 @@ export class ExtendedApplicationCommand<
               );
 
           if (nameArg.length == 1)
-            result.push(
-              singleCommand as RESTPostAPIChatInputApplicationCommandsJSONBody,
-            );
+            result.push({
+              ...(singleCommand as RESTPostAPIChatInputApplicationCommandsJSONBody),
+              ...defaultMemberPermission,
+            });
           else if (nameArg.length == 2)
             result
               .find((v) => v.name == nameArg[0])
