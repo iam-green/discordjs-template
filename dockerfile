@@ -8,19 +8,26 @@ RUN apt-get update && \
 RUN corepack enable && \
   corepack prepare pnpm@latest --activate
 
-# Build
-FROM base AS builder
+# Builder for dependencies
+FROM base AS deps
+WORKDIR /app
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+# Build stage
+FROM base AS build
 WORKDIR /app
 COPY . .
-RUN pnpm install --frozen-lockfile
+COPY --from=deps /app/node_modules ./node_modules
 RUN pnpm run build
 
 # Run
 FROM base AS deploy
 WORKDIR /app
 ENV NODE_ENV=production
-COPY --from=builder /app ./
-COPY --from=builder /app/node_modules ./node_modules
+COPY --from=build /app ./
+COPY --from=build /app/node_modules ./node_modules
 CMD ["pnpm", "start"]
+
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
   CMD curl --fail http://localhost:8000/health || exit 1
