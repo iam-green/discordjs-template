@@ -287,7 +287,7 @@ ExtendedComponent.components = new Map() as ExtendedComponentMap;
 
 ExtendedComponent.removeExpired = () => {
   for (const k of ExtendedComponent.components.keys())
-    if (k.expire && k.expire < Date.now())
+    if (k.expireTime && k.expireTime < Date.now())
       ExtendedComponent.components.delete(k);
 };
 
